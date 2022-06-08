@@ -1,4 +1,4 @@
-import { useAuthSignOut } from "@react-query-firebase/auth";
+import { useAuthSignOut, useAuthUser } from "@react-query-firebase/auth";
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -6,7 +6,16 @@ import { auth } from "../../firebase/firebase.utils";
 
 const MainPageContainer: React.FC = () => {
   const mutation = useAuthSignOut(auth);
-  console.log("auth", auth);
+  const { isLoading } = useAuthUser(["user"], auth);
+
+  if (isLoading) {
+    return (
+      <MainPageWrapper>
+        <MainPageTitle>Ficha Personagem</MainPageTitle>
+        Loading...
+      </MainPageWrapper>
+    );
+  }
 
   if (!auth.currentUser) {
     return (
