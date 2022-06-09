@@ -21,7 +21,7 @@ const PersonagemEquipamentosComponent: React.FC<PersonagemProps> = ({
                 setPersonagem({
                   ...personagem,
                   equipamento: personagem.equipamento.filter(
-                    t => t !== equipamento
+                    e => e !== equipamento
                   )
                 })
               }
