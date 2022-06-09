@@ -21,13 +21,16 @@ const MainPageContainer: React.FC = () => {
     return (
       <MainPageWrapper>
         <MainPageTitle>Ficha Personagem</MainPageTitle>
-        <LoginLink to="/login">Login</LoginLink>
+        <MainPageLink to="/login">Login</MainPageLink>
       </MainPageWrapper>
     );
   }
   return (
     <MainPageWrapper>
       <MainPageTitle>Ficha Personagem</MainPageTitle>
+      <MainPageLink to="/enigma-sol-oculto/personagem">
+        O Enigma do Sol Oculto
+      </MainPageLink>
       <button onClick={() => mutation.mutate()}>deslogar</button>
     </MainPageWrapper>
   );
@@ -44,7 +47,7 @@ export const MainPageWrapper = styled.div`
   grid-template-areas:
     "title"
     "login";
-  grid-template-rows: repeat(2, 60px);
+  grid-template-rows: repeat(2, 125px);
   align-items: center;
   text-align: center;
 `;
@@ -54,7 +57,7 @@ const MainPageTitle = styled.h2`
   grid-area: title;
 `;
 
-const LoginLink = styled(Link)`
+const MainPageLink = styled(Link)`
   grid-area: login;
   text-decoration: none;
   background-color: #310303;
@@ -64,7 +67,7 @@ const LoginLink = styled(Link)`
   padding: 20px 0px;
   margin: 0 auto;
   text-transform: uppercase;
-  width: 100px;
+  width: 300px;
   align-self: center;
 `;
 
