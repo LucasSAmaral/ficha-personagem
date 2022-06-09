@@ -5,8 +5,14 @@ import { MainPageWrapper } from "../main/Main.container";
 import { doc } from "firebase/firestore";
 import { firestore } from "../../firebase/firebase.utils";
 import { useParams } from "react-router-dom";
+import PersonagemSaudeComponent from "./components/personagem-saude.component";
+import PersonagemSanidadeComponent from "./components/personagem-sanidade.component";
+import PersonagemDinheiroComponent from "./components/personagem-dinheiro.component";
+import PersonagemTracosComponent from "./components/personagem-tracos.component";
+import PersonagemEquipamentosComponent from "./components/personagem-equipamento.component";
+import PersonagemNotasComponent from "./components/personagem-notas.component";
 
-type personagemStateType = {
+type PersonagemStateProps = {
   Nome: string;
   dinheiro: number;
   equipamento: Array<string>;
@@ -18,7 +24,12 @@ type personagemStateType = {
   ultimoParagrafo: string;
 };
 
-const initialState: personagemStateType = {
+export type PersonagemProps = {
+  personagem: PersonagemStateProps;
+  setPersonagem: React.Dispatch<React.SetStateAction<PersonagemStateProps>>;
+};
+
+const initialState: PersonagemStateProps = {
   Nome: "",
   dinheiro: 0,
   equipamento: [],
@@ -27,7 +38,7 @@ const initialState: personagemStateType = {
   sanidade: 0,
   saude: 0,
   tracos: [],
-  ultimoParagrafo: "",
+  ultimoParagrafo: ""
 };
 
 const EnigmaSolOcultoPersonagem: React.FC = () => {
@@ -40,13 +51,15 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
     { subscribe: true }
   );
 
-  const [personagem, setPersonagem] = useState<personagemStateType>(
+  const [personagem, setPersonagem] = useState<PersonagemStateProps>(
     initialState
   );
 
   useEffect(() => {
     if (personagemQueryResult.data) {
-      setPersonagem({ ...(personagemQueryResult.data as personagemStateType) });
+      setPersonagem({
+        ...(personagemQueryResult.data as PersonagemStateProps)
+      });
     }
     // @ts-ignore
   }, [personagemQueryResult.data]);
@@ -60,12 +73,30 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
   return (
     <PersonagemWrapper>
       <PersonagemNome>{personagem.Nome}</PersonagemNome>
-      <PersonagemSaude>Saúde</PersonagemSaude>
-      <PersonagemSanidade>Sanidade</PersonagemSanidade>
-      <PersonagemTracos>Traços</PersonagemTracos>
-      <PersonagemEquipamentos>Equipamentos</PersonagemEquipamentos>
-      <PersonagemDinheiro>Dinheiro</PersonagemDinheiro>
-      <PersonagemNotas>Notas</PersonagemNotas>
+      <PersonagemSaudeComponent
+        personagem={personagem}
+        setPersonagem={setPersonagem}
+      />
+      <PersonagemSanidadeComponent
+        personagem={personagem}
+        setPersonagem={setPersonagem}
+      />
+      <PersonagemTracosComponent
+        personagem={personagem}
+        setPersonagem={setPersonagem}
+      />
+      <PersonagemEquipamentosComponent
+        personagem={personagem}
+        setPersonagem={setPersonagem}
+      />
+      <PersonagemDinheiroComponent
+        personagem={personagem}
+        setPersonagem={setPersonagem}
+      />
+      <PersonagemNotasComponent
+        personagem={personagem}
+        setPersonagem={setPersonagem}
+      />
     </PersonagemWrapper>
   );
 };
@@ -76,35 +107,12 @@ const PersonagemWrapper = styled(MainPageWrapper)`
     "saude saude sanidade sanidade"
     "tracos tracos equipamentos equipamentos"
     "dinheiro dinheiro notas notas";
+  column-gap: 30px;
 `;
 
 const PersonagemNome = styled.h2`
-  font-size: ${(props) => props.theme.titleFontSize};
+  font-size: ${props => props.theme.titleFontSize};
   grid-area: nome;
-`;
-
-const PersonagemSaude = styled.div`
-  grid-area: saude;
-`;
-
-const PersonagemSanidade = styled.div`
-  grid-area: sanidade;
-`;
-
-const PersonagemTracos = styled.div`
-  grid-area: tracos;
-`;
-
-const PersonagemEquipamentos = styled.div`
-  grid-area: equipamentos;
-`;
-
-const PersonagemDinheiro = styled.div`
-  grid-area: dinheiro;
-`;
-
-const PersonagemNotas = styled.div`
-  grid-area: notas;
 `;
 
 export default EnigmaSolOcultoPersonagem;
