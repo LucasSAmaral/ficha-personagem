@@ -1,13 +1,56 @@
+import { useAuthSignInWithEmailAndPassword } from "@react-query-firebase/auth";
 import React from "react";
-import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import FormInputComponent, {
+  FormData,
+} from "../../components/FormInput.component";
+import { auth } from "../../firebase/firebase.utils";
 import { MainPageWrapper } from "../main/Main.container";
 
 const LoginContainer: React.FC = () => {
+  const { control, handleSubmit } = useForm<FormData>({
+    mode: "onSubmit",
+  });
+  const { mutate: LoginUser } = useAuthSignInWithEmailAndPassword(auth);
+
+  const navigate = useNavigate();
+
+  const onSubmit = handleSubmit(({ email, password }) => {
+    LoginUser(
+      { email, password },
+      {
+        onSuccess: () => {
+          navigate("/");
+        },
+        onError: () => {
+          alert("Erro ao logar");
+        },
+      }
+    );
+  });
   return (
     <LoginWrapper>
       <LoginTitle>Login</LoginTitle>
-      <LoginForm></LoginForm>
+      <LoginForm onSubmit={onSubmit}>
+        <FormInputComponent
+          control={control}
+          name="email"
+          label="E-mail"
+          type="email"
+          required
+        />
+        <FormInputComponent
+          control={control}
+          name="password"
+          label="Password"
+          type="password"
+          required
+        />
+
+        <LoginButton type="submit">Entrar</LoginButton>
+      </LoginForm>
 
       <SignUpLink to="/sign-up">Cadastre-se</SignUpLink>
     </LoginWrapper>
@@ -19,6 +62,7 @@ const LoginWrapper = styled(MainPageWrapper)`
     "title"
     "form"
     "signUpButton";
+  grid-template-rows: 60px 350px;
 `;
 
 const LoginTitle = styled.h2`
@@ -29,6 +73,8 @@ const LoginTitle = styled.h2`
 const LoginForm = styled.form`
   grid-area: form;
 `;
+
+const LoginButton = styled.button``;
 
 const SignUpLink = styled(Link)`
   grid-area: signUpButton;

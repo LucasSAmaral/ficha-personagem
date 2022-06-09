@@ -1,12 +1,18 @@
 import React from "react";
-import { Control, Controller, ControllerRenderProps } from "react-hook-form";
+import { Control, Controller } from "react-hook-form";
 import styled from "styled-components";
-import { SignUpFormData } from "../pages/sign-up/SignUp.container";
 
 type FormInputFields = "displayName" | "email" | "password" | "confirmPassword";
 
+export type FormData = {
+  email: string;
+  password: string;
+  displayName?: string;
+  confirmPassword?: string;
+};
+
 type FormInputComponentProps = {
-  control: Control<SignUpFormData, any>;
+  control: Control<FormData, any>;
   name: FormInputFields;
   type: React.HTMLInputTypeAttribute;
   required?: boolean;

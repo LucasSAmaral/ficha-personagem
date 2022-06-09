@@ -2,22 +2,17 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { MainPageWrapper } from "../main/Main.container";
 import { useForm } from "react-hook-form";
-import FormInputComponent from "../../components/FormInput.component";
+import FormInputComponent, {
+  FormData,
+} from "../../components/FormInput.component";
 import { auth, firestore } from "../../firebase/firebase.utils";
 import { useAuthCreateUserWithEmailAndPassword } from "@react-query-firebase/auth";
 import { useFirestoreDocumentMutation } from "@react-query-firebase/firestore";
 import { collection, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
-export type SignUpFormData = {
-  displayName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
-
 const SignUpContainer: React.FC = () => {
-  const { control, handleSubmit } = useForm<SignUpFormData>({
+  const { control, handleSubmit } = useForm<FormData>({
     mode: "onSubmit",
   });
 
