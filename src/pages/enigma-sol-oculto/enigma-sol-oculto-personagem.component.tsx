@@ -124,8 +124,8 @@ const PersonagemWrapper = styled(MainPageWrapper)`
     "nome nome nome nome"
     "saude saude sanidade sanidade"
     "tracos tracos equipamentos equipamentos"
-    "dinheiro dinheiro notas notas"
-    "status status ultParagrafo ultParagrafo"
+    "notas notas ultParagrafo ultParagrafo"
+    "dinheiro dinheiro status status"
     ". salvar salvar .";
   column-gap: 30px;
 `;

@@ -55,14 +55,15 @@ const PersonagemStatusToggle = styled.div`
 
 const PersonagemStatusToggleContainer = styled.div<{ status: boolean }>`
   position: relative;
-  background-color: lightgray;
-  width: 40%;
+  background-color: ${({ status }) => (status ? "#d4f3d4" : "lightgray")};
+  width: 70px;
   height: 30px;
   border-radius: 30px;
   cursor: pointer;
+  transition: all 0.4s ease 0s;
 
   ${PersonagemStatusToggle} {
-    left: ${({ status }) => (status ? "36px" : "0px")};
+    left: ${({ status }) => (status ? "calc(100% - 30px)" : "0px")};
     background-color: ${({ status }) => (status ? "#2ceb2c" : "gray")};
   }
 `;
