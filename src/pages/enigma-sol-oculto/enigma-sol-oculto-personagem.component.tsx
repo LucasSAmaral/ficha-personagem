@@ -1,16 +1,19 @@
-import { useFirestoreDocumentData } from "@react-query-firebase/firestore";
+import {
+  useFirestoreDocumentData,
+  useFirestoreDocumentMutation
+} from "@react-query-firebase/firestore";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { MainPageWrapper } from "../main/Main.container";
-import { doc } from "firebase/firestore";
+import { doc, collection } from "firebase/firestore";
 import { firestore } from "../../firebase/firebase.utils";
 import { useParams } from "react-router-dom";
-import PersonagemSaudeComponent from "./components/personagem-saude.component";
-import PersonagemSanidadeComponent from "./components/personagem-sanidade.component";
-import PersonagemDinheiroComponent from "./components/personagem-dinheiro.component";
-import PersonagemTracosComponent from "./components/personagem-tracos.component";
-import PersonagemEquipamentosComponent from "./components/personagem-equipamento.component";
-import PersonagemNotasComponent from "./components/personagem-notas.component";
+import Saude from "./components/personagem-saude.component";
+import Sanidade from "./components/personagem-sanidade.component";
+import Dinheiro from "./components/personagem-dinheiro.component";
+import Tracos from "./components/personagem-tracos.component";
+import Equipamentos from "./components/personagem-equipamento.component";
+import Notas from "./components/personagem-notas.component";
 
 type PersonagemStateProps = {
   Nome: string;
@@ -51,9 +54,23 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
     { subscribe: true }
   );
 
+  const personagemMutation = useFirestoreDocumentMutation(ref);
+
   const [personagem, setPersonagem] = useState<PersonagemStateProps>(
     initialState
   );
+
+  const {
+    Nome,
+    dinheiro,
+    equipamento,
+    morto,
+    notas,
+    sanidade,
+    saude,
+    tracos,
+    ultimoParagrafo
+  } = personagem;
 
   useEffect(() => {
     if (personagemQueryResult.data) {
@@ -64,39 +81,38 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
     // @ts-ignore
   }, [personagemQueryResult.data]);
 
-  console.log("personagem", personagem);
-
-  if (personagemQueryResult.isLoading) {
+  if (personagemQueryResult.isLoading || personagemMutation.isLoading) {
     return <>Loading...</>;
   }
 
   return (
     <PersonagemWrapper>
-      <PersonagemNome>{personagem.Nome}</PersonagemNome>
-      <PersonagemSaudeComponent
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-      />
-      <PersonagemSanidadeComponent
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-      />
-      <PersonagemTracosComponent
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-      />
-      <PersonagemEquipamentosComponent
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-      />
-      <PersonagemDinheiroComponent
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-      />
-      <PersonagemNotasComponent
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-      />
+      <PersonagemNome>{Nome}</PersonagemNome>
+      <Saude personagem={personagem} setPersonagem={setPersonagem} />
+      <Sanidade personagem={personagem} setPersonagem={setPersonagem} />
+      <Tracos personagem={personagem} setPersonagem={setPersonagem} />
+      <Equipamentos personagem={personagem} setPersonagem={setPersonagem} />
+      <Dinheiro personagem={personagem} setPersonagem={setPersonagem} />
+      <Notas personagem={personagem} setPersonagem={setPersonagem} />
+      <PersonagemStatus>Status</PersonagemStatus>
+      <PersonagemUltimoParagrafo>Último Parágrafo</PersonagemUltimoParagrafo>
+      <SalvarPersonagem
+        onClick={() =>
+          personagemMutation.mutate({
+            Nome,
+            dinheiro,
+            equipamento,
+            morto,
+            notas,
+            sanidade,
+            saude,
+            tracos,
+            ultimoParagrafo
+          })
+        }
+      >
+        Salvar Personagem
+      </SalvarPersonagem>
     </PersonagemWrapper>
   );
 };
@@ -106,13 +122,28 @@ const PersonagemWrapper = styled(MainPageWrapper)`
     "nome nome nome nome"
     "saude saude sanidade sanidade"
     "tracos tracos equipamentos equipamentos"
-    "dinheiro dinheiro notas notas";
+    "dinheiro dinheiro notas notas"
+    "status status ultParagrafo ultParagrafo"
+    ". salvar salvar .";
   column-gap: 30px;
 `;
 
 const PersonagemNome = styled.h2`
   font-size: ${props => props.theme.titleFontSize};
   grid-area: nome;
+`;
+
+const PersonagemStatus = styled.div`
+  grid-area: status;
+`;
+
+const PersonagemUltimoParagrafo = styled.div`
+  grid-area: ultParagrafo;
+`;
+
+const SalvarPersonagem = styled.button`
+  grid-area: salvar;
+  cursor: pointer;
 `;
 
 export default EnigmaSolOcultoPersonagem;
