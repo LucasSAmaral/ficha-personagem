@@ -5,7 +5,7 @@ import {
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { MainPageWrapper } from "../main/Main.container";
-import { doc, collection } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import { firestore } from "../../firebase/firebase.utils";
 import { useParams } from "react-router-dom";
 import Saude from "./components/personagem-saude.component";
@@ -14,6 +14,7 @@ import Dinheiro from "./components/personagem-dinheiro.component";
 import Tracos from "./components/personagem-tracos.component";
 import Equipamentos from "./components/personagem-equipamento.component";
 import Notas from "./components/personagem-notas.component";
+import UltimoParagrafo from "./components/personagem-ultimo-paragrafo.component";
 
 type PersonagemStateProps = {
   Nome: string;
@@ -95,7 +96,7 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
       <Dinheiro personagem={personagem} setPersonagem={setPersonagem} />
       <Notas personagem={personagem} setPersonagem={setPersonagem} />
       <PersonagemStatus>Status</PersonagemStatus>
-      <PersonagemUltimoParagrafo>Último Parágrafo</PersonagemUltimoParagrafo>
+      <UltimoParagrafo personagem={personagem} setPersonagem={setPersonagem} />
       <SalvarPersonagem
         onClick={() =>
           personagemMutation.mutate({
@@ -135,10 +136,6 @@ const PersonagemNome = styled.h2`
 
 const PersonagemStatus = styled.div`
   grid-area: status;
-`;
-
-const PersonagemUltimoParagrafo = styled.div`
-  grid-area: ultParagrafo;
 `;
 
 const SalvarPersonagem = styled.button`
