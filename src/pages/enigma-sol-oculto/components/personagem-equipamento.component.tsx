@@ -93,6 +93,7 @@ const AddPersonagemEquipamentosButton = styled.button`
   width: 100%;
   margin-top: 10px;
   cursor: pointer;
+  padding: 10px 0;
 `;
 
 export default PersonagemEquipamentosComponent;
