@@ -15,6 +15,7 @@ import Tracos from "./components/personagem-tracos.component";
 import Equipamentos from "./components/personagem-equipamento.component";
 import Notas from "./components/personagem-notas.component";
 import UltimoParagrafo from "./components/personagem-ultimo-paragrafo.component";
+import Status from "./components/personagem-status.component";
 
 type PersonagemStateProps = {
   Nome: string;
@@ -95,7 +96,7 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
       <Equipamentos personagem={personagem} setPersonagem={setPersonagem} />
       <Dinheiro personagem={personagem} setPersonagem={setPersonagem} />
       <Notas personagem={personagem} setPersonagem={setPersonagem} />
-      <PersonagemStatus>Status</PersonagemStatus>
+      <Status personagem={personagem} setPersonagem={setPersonagem} />
       <UltimoParagrafo personagem={personagem} setPersonagem={setPersonagem} />
       <SalvarPersonagem
         onClick={() =>
@@ -134,13 +135,10 @@ const PersonagemNome = styled.h2`
   grid-area: nome;
 `;
 
-const PersonagemStatus = styled.div`
-  grid-area: status;
-`;
-
 const SalvarPersonagem = styled.button`
   grid-area: salvar;
   cursor: pointer;
+  padding: 10px 0px;
 `;
 
 export default EnigmaSolOcultoPersonagem;
