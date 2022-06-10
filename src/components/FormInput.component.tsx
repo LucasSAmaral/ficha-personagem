@@ -1,8 +1,17 @@
 import React from "react";
 import { Control, Controller } from "react-hook-form";
 import styled from "styled-components";
+import { PersonagemStateProps } from "../pages/enigma-sol-oculto/enigma-sol-oculto-personagem.component";
 
-type FormInputFields = "displayName" | "email" | "password" | "confirmPassword";
+type FormInputFields =
+  | "displayName"
+  | "email"
+  | "password"
+  | "confirmPassword"
+  | "Nome"
+  | "saude"
+  | "sanidade"
+  | "dinheiro";
 
 export type FormData = {
   email: string;
@@ -11,8 +20,16 @@ export type FormData = {
   confirmPassword?: string;
 };
 
+type PersonagemFormData = Pick<PersonagemStateProps, "Nome"> & {
+  dinheiro: number;
+  sanidade: number;
+  saude: number;
+};
+
+export type ControlFormData = FormData | PersonagemFormData;
+
 type FormInputComponentProps = {
-  control: Control<FormData, any>;
+  control: Control<ControlFormData, any>;
   name: FormInputFields;
   type: React.HTMLInputTypeAttribute;
   required?: boolean;
@@ -24,7 +41,7 @@ const FormInputComponent: React.FC<FormInputComponentProps> = ({
   control,
   name,
   type,
-  required,
+  required
 }) => {
   return (
     <FormInputWrapper>

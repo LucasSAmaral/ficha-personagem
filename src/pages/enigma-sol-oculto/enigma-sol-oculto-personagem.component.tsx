@@ -17,7 +17,7 @@ import Notas from "./components/personagem-notas.component";
 import UltimoParagrafo from "./components/personagem-ultimo-paragrafo.component";
 import Status from "./components/personagem-status.component";
 
-type PersonagemStateProps = {
+export type PersonagemStateProps = {
   Nome: string;
   dinheiro: number;
   equipamento: Array<string>;

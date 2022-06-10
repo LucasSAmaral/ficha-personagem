@@ -3,7 +3,8 @@ import styled from "styled-components";
 import { MainPageWrapper } from "../main/Main.container";
 import { useForm } from "react-hook-form";
 import FormInputComponent, {
-  FormData,
+  ControlFormData,
+  FormData
 } from "../../components/FormInput.component";
 import { auth, firestore } from "../../firebase/firebase.utils";
 import { useAuthCreateUserWithEmailAndPassword } from "@react-query-firebase/auth";
@@ -12,8 +13,8 @@ import { collection, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 const SignUpContainer: React.FC = () => {
-  const { control, handleSubmit } = useForm<FormData>({
-    mode: "onSubmit",
+  const { control, handleSubmit } = useForm<ControlFormData>({
+    mode: "onSubmit"
   });
 
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const SignUpContainer: React.FC = () => {
 
   const {
     mutate: authMutate,
-    isLoading,
+    isLoading
   } = useAuthCreateUserWithEmailAndPassword(auth);
 
   const collectionRef = collection(firestore, "users");
@@ -31,8 +32,15 @@ const SignUpContainer: React.FC = () => {
 
   const { mutate: documentMutate } = useFirestoreDocumentMutation(ref);
 
-  const onSubmit = handleSubmit(
-    ({ confirmPassword, displayName, email, password }) => {
+  const onSubmit = handleSubmit(formData => {
+    if (
+      "password" in formData &&
+      "confirmPassword" &&
+      "email" in formData &&
+      "displayName" in formData
+    ) {
+      const { password, confirmPassword, email, displayName } = formData;
+
       if (password !== confirmPassword) {
         alert("Senhas não são iguais");
       }
@@ -49,17 +57,17 @@ const SignUpContainer: React.FC = () => {
               {
                 onSuccess: () => {
                   navigate("/");
-                },
+                }
               }
             );
           },
           onError: () => {
             alert("Erro ao cadastrar");
-          },
+          }
         }
       );
     }
-  );
+  });
 
   return (
     <SignUpWrapper>
@@ -111,7 +119,7 @@ const SignUpWrapper = styled(MainPageWrapper)`
 `;
 
 const SignUpTitle = styled.h2`
-  font-size: ${(props) => props.theme.titleFontSize};
+  font-size: ${props => props.theme.titleFontSize};
   grid-area: title;
 `;
 

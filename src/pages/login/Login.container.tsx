@@ -4,31 +4,34 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import FormInputComponent, {
-  FormData,
+  ControlFormData
 } from "../../components/FormInput.component";
 import { auth } from "../../firebase/firebase.utils";
 import { MainPageWrapper } from "../main/Main.container";
 
 const LoginContainer: React.FC = () => {
-  const { control, handleSubmit } = useForm<FormData>({
-    mode: "onSubmit",
+  const { control, handleSubmit } = useForm<ControlFormData>({
+    mode: "onSubmit"
   });
   const { mutate: LoginUser } = useAuthSignInWithEmailAndPassword(auth);
 
   const navigate = useNavigate();
 
-  const onSubmit = handleSubmit(({ email, password }) => {
-    LoginUser(
-      { email, password },
-      {
-        onSuccess: () => {
-          navigate("/");
-        },
-        onError: () => {
-          alert("Erro ao logar");
-        },
-      }
-    );
+  const onSubmit = handleSubmit(formData => {
+    if ("email" in formData && "password" in formData) {
+      const { email, password } = formData;
+      LoginUser(
+        { email, password },
+        {
+          onSuccess: () => {
+            navigate("/");
+          },
+          onError: () => {
+            alert("Erro ao logar");
+          }
+        }
+      );
+    }
   });
   return (
     <LoginWrapper>
@@ -66,7 +69,7 @@ const LoginWrapper = styled(MainPageWrapper)`
 `;
 
 const LoginTitle = styled.h2`
-  font-size: ${(props) => props.theme.titleFontSize};
+  font-size: ${props => props.theme.titleFontSize};
   grid-area: title;
 `;
 
