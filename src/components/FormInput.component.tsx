@@ -21,9 +21,9 @@ export type FormData = {
 };
 
 type PersonagemFormData = Pick<PersonagemStateProps, "Nome"> & {
-  dinheiro: number;
-  sanidade: number;
-  saude: number;
+  dinheiro: string;
+  sanidade: string;
+  saude: string;
 };
 
 export type ControlFormData = FormData | PersonagemFormData;

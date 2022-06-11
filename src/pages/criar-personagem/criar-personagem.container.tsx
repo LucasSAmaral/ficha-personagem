@@ -37,12 +37,12 @@ const CriarPersonagemContainer: React.FC = () => {
       personagemMutation.mutate(
         {
           Nome,
-          dinheiro,
+          dinheiro: parseInt(dinheiro),
           equipamento: [],
           morto: false,
           notas: "",
-          sanidade,
-          saude,
+          sanidade: parseInt(sanidade),
+          saude: parseInt(saude),
           tracos: [],
           ultimoParagrafo: ""
         },
