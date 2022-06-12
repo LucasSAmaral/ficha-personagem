@@ -9,8 +9,7 @@ import { doc } from "firebase/firestore";
 import { firestore } from "../../firebase/firebase.utils";
 import { useParams } from "react-router-dom";
 import PersonagemNumberProp from "./components/personagem-number-prop.component";
-import Tracos from "./components/personagem-tracos.component";
-import Equipamentos from "./components/personagem-equipamento.component";
+import PersonagemArrayProp from "./components/personagem-array-prop.component";
 import Notas from "./components/personagem-notas.component";
 import UltimoParagrafo from "./components/personagem-ultimo-paragrafo.component";
 import Status from "./components/personagem-status.component";
@@ -103,9 +102,19 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
         prop="sanidade"
       />
 
-      <Tracos personagem={personagem} setPersonagem={setPersonagem} />
+      <PersonagemArrayProp
+        personagem={personagem}
+        setPersonagem={setPersonagem}
+        title="Traços:"
+        prop="tracos"
+      />
 
-      <Equipamentos personagem={personagem} setPersonagem={setPersonagem} />
+      <PersonagemArrayProp
+        personagem={personagem}
+        setPersonagem={setPersonagem}
+        title="Equipamentos:"
+        prop="equipamento"
+      />
 
       <PersonagemNumberProp
         personagem={personagem}
@@ -145,7 +154,7 @@ const PersonagemWrapper = styled(MainPageWrapper)`
   grid-template-areas:
     "nome nome nome nome"
     "saude saude sanidade sanidade"
-    "tracos tracos equipamentos equipamentos"
+    "tracos tracos equipamento equipamento"
     "notas notas ultParagrafo ultParagrafo"
     "dinheiro dinheiro status status"
     ". salvar salvar .";
