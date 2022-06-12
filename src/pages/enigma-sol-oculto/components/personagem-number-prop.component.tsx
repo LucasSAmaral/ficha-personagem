@@ -2,11 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import { PersonagemProps } from "../enigma-sol-oculto-personagem.component";
 
-type Prop = "saude" | "sanidade" | "dinheiro";
+type NumberProp = "saude" | "sanidade" | "dinheiro";
 
 type PersonagemNumberProps = PersonagemProps & {
   title: string;
-  prop: Prop;
+  prop: NumberProp;
 };
 
 const PersonagemNumberPropComponent: React.FC<PersonagemNumberProps> = ({
@@ -39,7 +39,7 @@ const PersonagemNumberPropComponent: React.FC<PersonagemNumberProps> = ({
   );
 };
 
-const PersonagemProp = styled.div<{ prop: Prop }>`
+const PersonagemProp = styled.div<{ prop: NumberProp }>`
   grid-area: ${({ prop }) => prop};
 `;
 
