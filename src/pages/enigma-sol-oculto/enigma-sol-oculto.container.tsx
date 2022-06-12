@@ -60,7 +60,7 @@ const EnigmaSolOcultoContainer: React.FC = () => {
 const EnigmaWrapper = styled(MainPageWrapper)`
   grid-template-areas:
     "title title title title"
-    ". . . ."
+    "conteudo conteudo conteudo conteudo"
     ". criarPersonagem criarPersonagem .";
   grid-template-columns: repeat(4, 1fr);
 `;
@@ -70,11 +70,17 @@ const PersonagemTitle = styled.h2`
   grid-area: title;
 `;
 
-const PersonagemContent = styled.div``;
+const PersonagemContent = styled.div`
+  grid-area: conteudo;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: 15px;
+`;
 
 const PersonagemWrapper = styled.div`
   border: 1px solid black;
   cursor: pointer;
+  padding: 10px;
 `;
 
 const CriarPersonagem = styled(Link)`

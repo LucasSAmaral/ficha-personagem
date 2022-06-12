@@ -128,6 +128,7 @@ const PersonagemWrapper = styled(MainPageWrapper)`
     "dinheiro dinheiro status status"
     ". salvar salvar .";
   column-gap: 30px;
+  padding-top: 0;
 `;
 
 const PersonagemNome = styled.h2`
