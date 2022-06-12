@@ -8,9 +8,7 @@ import { MainPageWrapper } from "../main/Main.container";
 import { doc } from "firebase/firestore";
 import { firestore } from "../../firebase/firebase.utils";
 import { useParams } from "react-router-dom";
-import Saude from "./components/personagem-saude.component";
-import Sanidade from "./components/personagem-sanidade.component";
-import Dinheiro from "./components/personagem-dinheiro.component";
+import PersonagemNumberProp from "./components/personagem-number-prop.component";
 import Tracos from "./components/personagem-tracos.component";
 import Equipamentos from "./components/personagem-equipamento.component";
 import Notas from "./components/personagem-notas.component";
@@ -90,14 +88,38 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
   return (
     <PersonagemWrapper>
       <PersonagemNome>{Nome}</PersonagemNome>
-      <Saude personagem={personagem} setPersonagem={setPersonagem} />
-      <Sanidade personagem={personagem} setPersonagem={setPersonagem} />
+
+      <PersonagemNumberProp
+        personagem={personagem}
+        setPersonagem={setPersonagem}
+        title="Saúde Atual:"
+        prop="saude"
+      />
+
+      <PersonagemNumberProp
+        personagem={personagem}
+        setPersonagem={setPersonagem}
+        title="Sanidade Atual:"
+        prop="sanidade"
+      />
+
       <Tracos personagem={personagem} setPersonagem={setPersonagem} />
+
       <Equipamentos personagem={personagem} setPersonagem={setPersonagem} />
-      <Dinheiro personagem={personagem} setPersonagem={setPersonagem} />
+
+      <PersonagemNumberProp
+        personagem={personagem}
+        setPersonagem={setPersonagem}
+        title="Libras:"
+        prop="dinheiro"
+      />
+
       <Notas personagem={personagem} setPersonagem={setPersonagem} />
+
       <Status personagem={personagem} setPersonagem={setPersonagem} />
+
       <UltimoParagrafo personagem={personagem} setPersonagem={setPersonagem} />
+
       <SalvarPersonagem
         onClick={() =>
           personagemMutation.mutate({
