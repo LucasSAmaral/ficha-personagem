@@ -63,6 +63,7 @@ const EnigmaWrapper = styled(MainPageWrapper)`
     "conteudo conteudo conteudo conteudo"
     ". criarPersonagem criarPersonagem .";
   grid-template-columns: repeat(4, 1fr);
+  row-gap: 5.8rem;
 `;
 
 const PersonagemTitle = styled.h2`
@@ -75,6 +76,7 @@ const PersonagemContent = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   column-gap: 15px;
+  row-gap: 15px;
 `;
 
 const PersonagemWrapper = styled.div`
