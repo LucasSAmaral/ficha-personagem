@@ -13,6 +13,7 @@ import PersonagemArrayProp from "./components/personagem-array-prop.component";
 import Notas from "./components/personagem-notas.component";
 import UltimoParagrafo from "./components/personagem-ultimo-paragrafo.component";
 import Status from "./components/personagem-status.component";
+import Loading from "./components/loading-component";
 
 export type PersonagemStateProps = {
   Nome: string;
@@ -81,7 +82,7 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
   }, [personagemQueryResult.data]);
 
   if (personagemQueryResult.isLoading || personagemMutation.isLoading) {
-    return <>Loading...</>;
+    return <Loading>Loading...</Loading>;
   }
 
   return (
