@@ -6,6 +6,7 @@ import { query, collection } from "firebase/firestore";
 import { firestore } from "../../firebase/firebase.utils";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import Loading from "./components/loading-component";
 
 const EnigmaSolOcultoContainer: React.FC = () => {
   const navigate = useNavigate();
@@ -27,9 +28,13 @@ const EnigmaSolOcultoContainer: React.FC = () => {
   switch (status as "idle" | "error" | "loading" | "success") {
     case "loading":
     case "idle":
-      return <>Loading...</>;
+      return (
+        <Loading>
+          <h2>Loading...</h2>
+        </Loading>
+      );
     case "error":
-      return <>Erro ao mostrar lista de personagens</>;
+      return <ErrorMessage>Erro ao mostrar lista de personagens</ErrorMessage>;
     case "success":
       return (
         <EnigmaWrapper>
@@ -56,6 +61,10 @@ const EnigmaSolOcultoContainer: React.FC = () => {
       );
   }
 };
+
+const ErrorMessage = styled(Loading)`
+  color: red;
+`;
 
 const EnigmaWrapper = styled(MainPageWrapper)`
   grid-template-areas:
