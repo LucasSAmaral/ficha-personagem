@@ -73,6 +73,15 @@ const EnigmaWrapper = styled(MainPageWrapper)`
     ". criarPersonagem criarPersonagem .";
   grid-template-columns: repeat(4, 1fr);
   row-gap: 5.8rem;
+
+  @media (max-width: 425px) {
+    grid-template-areas:
+      "title"
+      "conteudo"
+      "criarPersonagem";
+    grid-template-columns: 1fr;
+    row-gap: 1rem;
+  }
 `;
 
 const PersonagemTitle = styled.h2`
@@ -86,6 +95,10 @@ const PersonagemContent = styled.div`
   grid-template-columns: repeat(4, 1fr);
   column-gap: 15px;
   row-gap: 15px;
+
+  @media (max-width: 425px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const PersonagemWrapper = styled.div`

@@ -41,6 +41,10 @@ const PersonagemNumberPropComponent: React.FC<PersonagemNumberProps> = ({
 
 const PersonagemProp = styled.div<{ prop: NumberProp }>`
   grid-area: ${({ prop }) => prop};
+
+  @media (max-width: 425px) {
+    margin-top: 12px;
+  }
 `;
 
 const PersonagemPropTitle = styled.p`

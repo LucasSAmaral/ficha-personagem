@@ -66,6 +66,10 @@ const PersonagemArrayPropComponent: React.FC<PersonagemArrayProps> = ({
 
 const PersonagemArray = styled.div<{ prop: ArrayProp }>`
   grid-area: ${({ prop }) => prop};
+
+  @media (max-width: 425px) {
+    margin-top: 20px;
+  }
 `;
 
 const PersonagemArrayTitle = styled.p`
