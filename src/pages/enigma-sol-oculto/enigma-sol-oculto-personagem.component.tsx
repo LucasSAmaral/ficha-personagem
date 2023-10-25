@@ -161,6 +161,22 @@ const PersonagemWrapper = styled(MainPageWrapper)`
     ". salvar salvar .";
   column-gap: 30px;
   padding-top: 0;
+
+  @media (max-width: 425px) {
+    grid-template-areas:
+      "nome"
+      "saude"
+      "sanidade"
+      "tracos"
+      "equipamento"
+      "notas"
+      "ultParagrafo"
+      "dinheiro"
+      "status"
+      "salvar";
+    justify-content: center;
+    margin-bottom: 50px;
+  }
 `;
 
 const PersonagemNome = styled.h2`
@@ -172,6 +188,10 @@ const SalvarPersonagem = styled.button`
   grid-area: salvar;
   cursor: pointer;
   padding: 10px 0px;
+
+  @media (max-width: 425px) {
+    margin-top: 20px;
+  }
 `;
 
 export default EnigmaSolOcultoPersonagem;

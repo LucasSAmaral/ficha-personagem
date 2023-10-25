@@ -50,10 +50,14 @@ export const MainPageWrapper = styled.div`
   grid-template-rows: repeat(2, 125px);
   align-items: center;
   text-align: center;
+
+  @media (max-width: 425px) {
+    grid-template-rows: 125px;
+  }
 `;
 
 const MainPageTitle = styled.h2`
-  font-size: ${(props) => props.theme.titleFontSize};
+  font-size: ${props => props.theme.titleFontSize};
   grid-area: title;
 `;
 
