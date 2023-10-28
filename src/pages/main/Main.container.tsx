@@ -47,7 +47,6 @@ export const MainPageWrapper = styled.div`
   grid-template-areas:
     "title"
     "login";
-  grid-template-rows: repeat(2, 125px);
   align-items: center;
   text-align: center;
 
