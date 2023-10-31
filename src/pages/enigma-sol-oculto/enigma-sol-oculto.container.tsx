@@ -97,6 +97,7 @@ const PersonagemContent = styled.div`
 
   @media (max-width: 425px) {
     grid-template-columns: 1fr;
+    justify-items: center;
   }
 `;
 
@@ -104,6 +105,10 @@ const PersonagemWrapper = styled.div`
   border: 1px solid black;
   cursor: pointer;
   padding: 10px;
+
+  @media (max-width: 425px) {
+    width: 200px;
+  }
 `;
 
 const CriarPersonagem = styled(Link)`
