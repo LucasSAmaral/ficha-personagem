@@ -3,10 +3,10 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import FormInputComponent, {
   ControlFormData
-} from "../../components/FormInput.component";
-import { MainPageWrapper } from "../main/Main.container";
+} from "../../../components/FormInput.component";
+import { MainPageWrapper } from "../../main/Main.container";
 import { doc } from "firebase/firestore";
-import { firestore } from "../../firebase/firebase.utils";
+import { firestore } from "../../../firebase/firebase.utils";
 import { useFirestoreDocumentMutation } from "@react-query-firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";

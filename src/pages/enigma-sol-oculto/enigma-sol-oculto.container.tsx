@@ -81,6 +81,7 @@ const EnigmaWrapper = styled(MainPageWrapper)`
     "conteudo conteudo conteudo conteudo"
     ". criarPersonagem criarPersonagem .";
   grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto;
 
   @media (max-width: 425px) {
     grid-template-areas:

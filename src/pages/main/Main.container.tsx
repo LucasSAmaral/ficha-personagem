@@ -1,7 +1,7 @@
 import { useAuthSignOut, useAuthUser } from "@react-query-firebase/auth";
 import React from "react";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { auth } from "../../firebase/firebase.utils";
 import Cookies from "js-cookie";
 
@@ -24,24 +24,35 @@ const MainPageContainer: React.FC = () => {
 
   if (!auth.currentUser) {
     return (
-      <MainPageWrapper>
+      <MainPageWrapper isUserLoggedIn={Boolean(auth.currentUser)}>
         <MainPageTitle>Ficha Personagem</MainPageTitle>
-        <MainPageLink to="/login">Login</MainPageLink>
+        <MainPageLink to="/login" gridArea="login">
+          Login
+        </MainPageLink>
       </MainPageWrapper>
     );
   }
   return (
-    <MainPageWrapper>
+    <MainPageWrapper isUserLoggedIn={Boolean(auth.currentUser)}>
       <MainPageTitle>Ficha Personagem</MainPageTitle>
-      <MainPageLink to="/enigma-sol-oculto/personagem">
+      <MainPageLink
+        to="/enigma-sol-oculto/personagem"
+        gridArea="enigma-sol-oculto"
+      >
         O Enigma do Sol Oculto
+      </MainPageLink>
+      <MainPageLink
+        to="/uivo-do-lobisomem/personagem"
+        gridArea="uivo-do-lobisomem"
+      >
+        Uivo do Lobisomem
       </MainPageLink>
       <button onClick={() => mutation.mutate()}>deslogar</button>
     </MainPageWrapper>
   );
 };
 
-export const MainPageWrapper = styled.div`
+export const MainPageWrapper = styled.div<{ isUserLoggedIn?: boolean }>`
   max-width: 600px;
   width: 100%;
   margin: 0 auto;
@@ -49,11 +60,23 @@ export const MainPageWrapper = styled.div`
   padding-top: 50px;
 
   display: grid;
-  grid-template-areas:
-    "title"
-    "login";
+  ${({ isUserLoggedIn }) =>
+    isUserLoggedIn
+      ? css`
+          grid-template-areas:
+            "title"
+            "enigma-sol-oculto"
+            "uivo-do-lobisomem";
+        `
+      : css`
+          grid-template-areas:
+            "title"
+            "login";
+        `}
   align-items: center;
   text-align: center;
+  grid-template-rows: repeat(3, 57px);
+  grid-gap: 30px;
 
   @media (max-width: 425px) {
     grid-template-rows: 125px;
@@ -65,8 +88,10 @@ const MainPageTitle = styled.h2`
   grid-area: title;
 `;
 
-const MainPageLink = styled(Link)`
-  grid-area: login;
+const MainPageLink = styled(Link)<{
+  gridArea: "login" | "enigma-sol-oculto" | "uivo-do-lobisomem";
+}>`
+  grid-area: ${({ gridArea }) => gridArea};
   text-decoration: none;
   background-color: #310303;
   color: white;
