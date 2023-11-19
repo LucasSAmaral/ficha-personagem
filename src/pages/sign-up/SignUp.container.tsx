@@ -11,6 +11,7 @@ import { useAuthCreateUserWithEmailAndPassword } from "@react-query-firebase/aut
 import { useFirestoreDocumentMutation } from "@react-query-firebase/firestore";
 import { collection, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const SignUpContainer: React.FC = () => {
   const { control, handleSubmit } = useForm<ControlFormData>({
@@ -56,6 +57,7 @@ const SignUpContainer: React.FC = () => {
               { displayName, email, createdAt },
               {
                 onSuccess: () => {
+                  Cookies.set("userId", user.uid);
                   navigate("/");
                 }
               }
