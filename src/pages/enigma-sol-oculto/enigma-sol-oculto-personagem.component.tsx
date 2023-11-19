@@ -14,6 +14,7 @@ import Notas from "./components/personagem-notas.component";
 import UltimoParagrafo from "./components/personagem-ultimo-paragrafo.component";
 import Status from "./components/personagem-status.component";
 import Loading from "./components/loading-component";
+import Cookies from "js-cookie";
 
 export type PersonagemStateProps = {
   Nome: string;
@@ -47,9 +48,15 @@ const initialState: PersonagemStateProps = {
 const EnigmaSolOcultoPersonagem: React.FC = () => {
   const { nomePersonagem } = useParams<{ nomePersonagem: string }>();
   const safeNomePersonagem = nomePersonagem ? nomePersonagem : "";
-  const ref = doc(firestore, "enigma-sol-oculto-fichas", safeNomePersonagem);
+  const userId = Cookies.get("userId");
+  const safeUserId = userId ? userId : "";
+  const ref = doc(
+    firestore,
+    "enigma-sol-oculto-fichas",
+    `${safeUserId}__${safeNomePersonagem}`
+  );
   const personagemQueryResult = useFirestoreDocumentData(
-    ["enigma-sol-oculto-fichas", safeNomePersonagem],
+    ["enigma-sol-oculto-fichas", `${safeUserId}__${safeNomePersonagem}`],
     ref,
     { subscribe: true }
   );

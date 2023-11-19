@@ -7,6 +7,7 @@ import { firestore } from "../../firebase/firebase.utils";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Loading from "./components/loading-component";
+import Cookies from "js-cookie";
 
 const EnigmaSolOcultoContainer: React.FC = () => {
   const navigate = useNavigate();
@@ -19,11 +20,15 @@ const EnigmaSolOcultoContainer: React.FC = () => {
     }
   );
 
+  const userId = Cookies.get("userId");
+
   const { data, status } = fichasQueryData;
 
   if (!data) {
     return null;
   }
+
+  const personagensByUser = data.filter(d => d.userId === userId);
 
   switch (status as "idle" | "error" | "loading" | "success") {
     case "loading":
@@ -40,10 +45,14 @@ const EnigmaSolOcultoContainer: React.FC = () => {
         <EnigmaWrapper>
           <PersonagemTitle>Personagens</PersonagemTitle>
           <PersonagemContent>
-            {data.map((personagem, index) => (
+            {personagensByUser.map((personagem, index) => (
               <PersonagemWrapper
                 key={index}
-                onClick={() => navigate(`${personagem.Nome}`)}
+                onClick={() => {
+                  const personagemNome = personagem.Nome as string;
+                  const safePersonagemNome = personagemNome.replace(" ", "_");
+                  navigate(`${safePersonagemNome}`);
+                }}
               >
                 <p>{personagem.Nome}</p>
                 <p>Saúde: {personagem.saude}</p>

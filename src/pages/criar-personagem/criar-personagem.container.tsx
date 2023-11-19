@@ -9,6 +9,7 @@ import { doc } from "firebase/firestore";
 import { firestore } from "../../firebase/firebase.utils";
 import { useFirestoreDocumentMutation } from "@react-query-firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const CriarPersonagemContainer: React.FC = () => {
   const { control, handleSubmit } = useForm<ControlFormData>({
@@ -19,7 +20,17 @@ const CriarPersonagemContainer: React.FC = () => {
 
   const [novoNome, setNovoNome] = useState("inicial");
 
-  const ref = doc(firestore, "enigma-sol-oculto-fichas", novoNome);
+  const userId = Cookies.get("userId");
+
+  const safeUserId = userId ? userId : "";
+
+  const safeNovoNome = novoNome.replace(" ", "_");
+
+  const ref = doc(
+    firestore,
+    "enigma-sol-oculto-fichas",
+    `${safeUserId}__${safeNovoNome}`
+  );
 
   const personagemMutation = useFirestoreDocumentMutation(ref);
 
@@ -34,6 +45,9 @@ const CriarPersonagemContainer: React.FC = () => {
 
       setNovoNome(Nome);
 
+      const userId = Cookies.get("userId");
+      const safeUserId = userId ? userId : "";
+
       personagemMutation.mutate(
         {
           Nome,
@@ -44,7 +58,8 @@ const CriarPersonagemContainer: React.FC = () => {
           sanidade: parseInt(sanidade),
           saude: parseInt(saude),
           tracos: [],
-          ultimoParagrafo: ""
+          ultimoParagrafo: "",
+          userId: safeUserId
         },
         {
           onSuccess: () => {
