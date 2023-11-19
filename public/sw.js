@@ -1,13 +1,8 @@
-var CACHE_NAME = "mtg-life-counter";
+var CACHE_NAME = "ficha-personagem";
 
 var urlsToCache = [
-  "/mtg-life-counter/",
-  "/mtg-life-counter/static/js/2.1b30836e.chunk.js",
-  "/mtg-life-counter/static/js/main.4f529a54.chunk.js",
-  "/mtg-life-counter/static/css/main.4fba246b.chunk.css",
-  "/mtg-life-counter/static/css/main.4fba246b.chunk.css?family=MTG",
-  "/mtg-life-counter/static/js/runtime-main.45f50031.js",
-  "/mtg-life-counter/favicon.ico",
+  "/ficha-personagem/",
+  "/ficha-personagem/favicon.ico",
 ];
 
 self.addEventListener("install", function (event) {
