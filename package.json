@@ -1,6 +1,6 @@
 {
   "name": "ficha-personagem",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "dependencies": {
     "@react-query-firebase/auth": "^0.3.4",
@@ -15,6 +15,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/styled-components": "^5.1.25",
     "firebase": "^9.8.2",
+    "js-cookie": "^3.0.5",
     "node-sass": "^7.0.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
@@ -30,7 +31,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "release": "standard-version && git push --follow-tags origin main"
   },
   "eslintConfig": {
     "extends": [
@@ -49,5 +51,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
+    "standard-version": "^9.5.0"
   }
 }

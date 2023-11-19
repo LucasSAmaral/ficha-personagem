@@ -3,9 +3,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { auth } from "../../firebase/firebase.utils";
+import Cookies from "js-cookie";
 
 const MainPageContainer: React.FC = () => {
-  const mutation = useAuthSignOut(auth);
+  const mutation = useAuthSignOut(auth, {
+    onSuccess: () => {
+      Cookies.remove("userId");
+    }
+  });
   const { isLoading } = useAuthUser(["user"], auth);
 
   if (isLoading) {
@@ -47,7 +52,6 @@ export const MainPageWrapper = styled.div`
   grid-template-areas:
     "title"
     "login";
-  grid-template-rows: repeat(2, 125px);
   align-items: center;
   text-align: center;
 
