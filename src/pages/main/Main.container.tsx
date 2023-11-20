@@ -39,12 +39,6 @@ const MainPageContainer: React.FC = () => {
       >
         O Enigma do Sol Oculto
       </MainPageLink>
-      <MainPageLink
-        to="/uivo-do-lobisomem/personagem"
-        gridArea="uivo-do-lobisomem"
-      >
-        Uivo do Lobisomem
-      </MainPageLink>
       <LogoutButton onClick={() => mutation.mutate()}>deslogar</LogoutButton>
     </MainPageWrapper>
   );
