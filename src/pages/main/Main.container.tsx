@@ -3,14 +3,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { auth } from "../../firebase/firebase.utils";
-import Cookies from "js-cookie";
 
 const MainPageContainer: React.FC = () => {
-  const mutation = useAuthSignOut(auth, {
-    onSuccess: () => {
-      Cookies.remove("userId");
-    }
-  });
+  const mutation = useAuthSignOut(auth);
   const { isLoading } = useAuthUser(["user"], auth);
 
   if (isLoading) {
