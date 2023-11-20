@@ -3,11 +3,10 @@ import styled from "styled-components";
 import { useFirestoreQueryData } from "@react-query-firebase/firestore";
 import { MainPageWrapper } from "../main/Main.container";
 import { query, collection } from "firebase/firestore";
-import { firestore } from "../../firebase/firebase.utils";
+import { auth, firestore } from "../../firebase/firebase.utils";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Loading from "./components/loading-component";
-import Cookies from "js-cookie";
 
 const EnigmaSolOcultoContainer: React.FC = () => {
   const navigate = useNavigate();
@@ -20,7 +19,7 @@ const EnigmaSolOcultoContainer: React.FC = () => {
     }
   );
 
-  const userId = Cookies.get("userId");
+  const userId = auth.currentUser ? auth.currentUser.uid : "";
 
   const { data, status } = fichasQueryData;
 

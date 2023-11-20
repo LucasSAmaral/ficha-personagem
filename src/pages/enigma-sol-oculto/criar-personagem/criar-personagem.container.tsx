@@ -6,10 +6,9 @@ import FormInputComponent, {
 } from "../../../components/FormInput.component";
 import { MainPageWrapper } from "../../main/Main.container";
 import { doc } from "firebase/firestore";
-import { firestore } from "../../../firebase/firebase.utils";
+import { auth, firestore } from "../../../firebase/firebase.utils";
 import { useFirestoreDocumentMutation } from "@react-query-firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 
 const CriarPersonagemContainer: React.FC = () => {
   const { control, handleSubmit } = useForm<ControlFormData>({
@@ -20,16 +19,14 @@ const CriarPersonagemContainer: React.FC = () => {
 
   const [novoNome, setNovoNome] = useState("inicial");
 
-  const userId = Cookies.get("userId");
-
-  const safeUserId = userId ? userId : "";
+  const userId = auth.currentUser ? auth.currentUser.uid : "";
 
   const safeNovoNome = novoNome.replace(" ", "_");
 
   const ref = doc(
     firestore,
     "enigma-sol-oculto-fichas",
-    `${safeUserId}__${safeNovoNome}`
+    `${userId}__${safeNovoNome}`
   );
 
   const personagemMutation = useFirestoreDocumentMutation(ref);
@@ -45,9 +42,6 @@ const CriarPersonagemContainer: React.FC = () => {
 
       setNovoNome(Nome);
 
-      const userId = Cookies.get("userId");
-      const safeUserId = userId ? userId : "";
-
       personagemMutation.mutate(
         {
           Nome,
@@ -59,7 +53,7 @@ const CriarPersonagemContainer: React.FC = () => {
           saude: parseInt(saude),
           tracos: [],
           ultimoParagrafo: "",
-          userId: safeUserId
+          userId: userId
         },
         {
           onSuccess: () => {

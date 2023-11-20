@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { MainPageWrapper } from "../main/Main.container";
 import { doc } from "firebase/firestore";
-import { firestore } from "../../firebase/firebase.utils";
+import { auth, firestore } from "../../firebase/firebase.utils";
 import { useParams } from "react-router-dom";
 import PersonagemNumberProp from "./components/personagem-number-prop.component";
 import PersonagemArrayProp from "./components/personagem-array-prop.component";
@@ -14,7 +14,6 @@ import Notas from "./components/personagem-notas.component";
 import UltimoParagrafo from "./components/personagem-ultimo-paragrafo.component";
 import Status from "./components/personagem-status.component";
 import Loading from "./components/loading-component";
-import Cookies from "js-cookie";
 
 export type PersonagemStateProps = {
   Nome: string;
@@ -48,15 +47,14 @@ const initialState: PersonagemStateProps = {
 const EnigmaSolOcultoPersonagem: React.FC = () => {
   const { nomePersonagem } = useParams<{ nomePersonagem: string }>();
   const safeNomePersonagem = nomePersonagem ? nomePersonagem : "";
-  const userId = Cookies.get("userId");
-  const safeUserId = userId ? userId : "";
+  const userId = auth.currentUser ? auth.currentUser.uid : "";
   const ref = doc(
     firestore,
     "enigma-sol-oculto-fichas",
-    `${safeUserId}__${safeNomePersonagem}`
+    `${userId}__${safeNomePersonagem}`
   );
   const personagemQueryResult = useFirestoreDocumentData(
-    ["enigma-sol-oculto-fichas", `${safeUserId}__${safeNomePersonagem}`],
+    ["enigma-sol-oculto-fichas", `${userId}__${safeNomePersonagem}`],
     ref,
     { subscribe: true }
   );
