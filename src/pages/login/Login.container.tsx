@@ -7,6 +7,7 @@ import FormInputComponent, {
   ControlFormData
 } from "../../components/FormInput.component";
 import { auth } from "../../firebase/firebase.utils";
+import { ButtonCssStyle } from "../../theme/styles";
 import { MainPageWrapper } from "../main/Main.container";
 
 const LoginContainer: React.FC = () => {
@@ -77,20 +78,15 @@ const LoginForm = styled.form`
   grid-area: form;
 `;
 
-const LoginButton = styled.button``;
+const LoginButton = styled.button`
+  ${ButtonCssStyle}
+  border: none;
+  cursor: pointer;
+`;
 
 const SignUpLink = styled(Link)`
   grid-area: signUpButton;
-  text-decoration: none;
-  background-color: #310303;
-  color: white;
-  font-weight: bold;
-  text-align: center;
-  padding: 20px 0px;
-  margin: 0 auto;
-  text-transform: uppercase;
-  width: 150px;
-  align-self: center;
+  ${ButtonCssStyle}
 `;
 
 export default LoginContainer;

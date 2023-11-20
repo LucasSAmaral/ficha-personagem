@@ -165,6 +165,7 @@ const PersonagemWrapper = styled(MainPageWrapper)`
     "notas notas ultParagrafo ultParagrafo"
     "dinheiro dinheiro status status"
     ". salvar salvar .";
+  column-gap: 30px;
   padding-top: 0;
   grid-template-rows: auto;
 
