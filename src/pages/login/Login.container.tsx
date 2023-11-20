@@ -8,7 +8,6 @@ import FormInputComponent, {
 } from "../../components/FormInput.component";
 import { auth } from "../../firebase/firebase.utils";
 import { MainPageWrapper } from "../main/Main.container";
-import Cookies from "js-cookie";
 
 const LoginContainer: React.FC = () => {
   const { control, handleSubmit } = useForm<ControlFormData>({
@@ -24,11 +23,7 @@ const LoginContainer: React.FC = () => {
       LoginUser(
         { email, password },
         {
-          onSuccess: data => {
-            const {
-              user: { uid: userId }
-            } = data;
-            Cookies.set("userId", userId);
+          onSuccess: () => {
             navigate("/");
           },
           onError: () => {
