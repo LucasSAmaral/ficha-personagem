@@ -9,6 +9,7 @@ import { doc } from "firebase/firestore";
 import { auth, firestore } from "../../../firebase/firebase.utils";
 import { useFirestoreDocumentMutation } from "@react-query-firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { ButtonCssStyle } from "../../../theme/styles";
 
 const CriarPersonagemContainer: React.FC = () => {
   const { control, handleSubmit } = useForm<ControlFormData>({
@@ -129,6 +130,8 @@ const CriarPersonagemForm = styled.form`
 
 const CriarPersonagemButton = styled.button`
   cursor: pointer;
+  border: none;
+  ${ButtonCssStyle}
 `;
 
 export default CriarPersonagemContainer;

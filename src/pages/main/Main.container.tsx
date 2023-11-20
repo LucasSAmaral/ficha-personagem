@@ -3,6 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled, { css } from "styled-components";
 import { auth } from "../../firebase/firebase.utils";
+import { ButtonCssStyle } from "../../theme/styles";
 
 type GridArea = "login" | "enigma-sol-oculto" | "uivo-do-lobisomem";
 
@@ -44,7 +45,7 @@ const MainPageContainer: React.FC = () => {
       >
         Uivo do Lobisomem
       </MainPageLink>
-      <button onClick={() => mutation.mutate()}>deslogar</button>
+      <LogoutButton onClick={() => mutation.mutate()}>deslogar</LogoutButton>
     </MainPageWrapper>
   );
 };
@@ -89,16 +90,13 @@ const MainPageLink = styled(Link)<{
   gridArea: GridArea;
 }>`
   grid-area: ${({ gridArea }) => gridArea};
-  text-decoration: none;
-  background-color: #310303;
-  color: white;
-  font-weight: bold;
-  text-align: center;
-  padding: 20px 0px;
-  margin: 0 auto;
-  text-transform: uppercase;
-  width: 300px;
-  align-self: center;
+  ${ButtonCssStyle}
+`;
+
+const LogoutButton = styled.button`
+  ${ButtonCssStyle}
+  border: none;
+  cursor: pointer;
 `;
 
 export default MainPageContainer;
