@@ -166,6 +166,7 @@ const PersonagemWrapper = styled(MainPageWrapper)`
     "dinheiro dinheiro status status"
     ". salvar salvar .";
   column-gap: 30px;
+  grid-template-rows: auto;
   padding-top: 0;
 
   @media (max-width: 425px) {
