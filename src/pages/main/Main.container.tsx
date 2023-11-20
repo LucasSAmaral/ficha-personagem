@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import styled, { css } from "styled-components";
 import { auth } from "../../firebase/firebase.utils";
 
+type GridArea = "login" | "enigma-sol-oculto" | "uivo-do-lobisomem";
+
 const MainPageContainer: React.FC = () => {
   const mutation = useAuthSignOut(auth);
   const { isLoading } = useAuthUser(["user"], auth);
@@ -84,7 +86,7 @@ const MainPageTitle = styled.h2`
 `;
 
 const MainPageLink = styled(Link)<{
-  gridArea: "login" | "enigma-sol-oculto" | "uivo-do-lobisomem";
+  gridArea: GridArea;
 }>`
   grid-area: ${({ gridArea }) => gridArea};
   text-decoration: none;
