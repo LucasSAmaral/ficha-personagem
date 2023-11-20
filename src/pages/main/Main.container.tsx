@@ -39,6 +39,12 @@ const MainPageContainer: React.FC = () => {
       >
         O Enigma do Sol Oculto
       </MainPageLink>
+      <MainPageLink
+        to="/uivo-do-lobisomem/personagem"
+        gridArea="uivo-do-lobisomem"
+      >
+        Uivo do Lobisomem
+      </MainPageLink>
       <LogoutButton onClick={() => mutation.mutate()}>deslogar</LogoutButton>
     </MainPageWrapper>
   );
@@ -57,7 +63,8 @@ export const MainPageWrapper = styled.div<{ isUserLoggedIn?: boolean }>`
       ? css`
           grid-template-areas:
             "title"
-            "enigma-sol-oculto";
+            "enigma-sol-oculto"
+            "uivo-do-lobisomem";
         `
       : css`
           grid-template-areas:
@@ -66,7 +73,7 @@ export const MainPageWrapper = styled.div<{ isUserLoggedIn?: boolean }>`
         `}
   align-items: center;
   text-align: center;
-  grid-template-rows: repeat(2, 57px);
+  grid-template-rows: repeat(3, 57px);
   grid-gap: 30px;
 
   @media (max-width: 425px) {

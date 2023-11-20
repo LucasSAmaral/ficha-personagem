@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import CriarPersonagemContainer from "./pages/criar-personagem/criar-personagem.container";
+import CriarPersonagemContainer from "./pages/enigma-sol-oculto/criar-personagem/criar-personagem.container";
 import EnigmaSolOcultoPersonagem from "./pages/enigma-sol-oculto/enigma-sol-oculto-personagem.component";
 import EnigmaSolOcultoContainer from "./pages/enigma-sol-oculto/enigma-sol-oculto.container";
 import LoginContainer from "./pages/login/Login.container";
@@ -25,6 +25,10 @@ function AppRoutes() {
           <Route
             path="enigma-sol-oculto/personagem/:nomePersonagem"
             element={<EnigmaSolOcultoPersonagem />}
+          />
+          <Route
+            path="uivo-do-lobisomem/personagem"
+            element={<>Quase lá...</>}
           />
         </Route>
       </Routes>

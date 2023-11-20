@@ -3,13 +3,13 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import FormInputComponent, {
   ControlFormData
-} from "../../components/FormInput.component";
-import { MainPageWrapper } from "../main/Main.container";
+} from "../../../components/FormInput.component";
+import { MainPageWrapper } from "../../main/Main.container";
 import { doc } from "firebase/firestore";
-import { auth, firestore } from "../../firebase/firebase.utils";
+import { auth, firestore } from "../../../firebase/firebase.utils";
 import { useFirestoreDocumentMutation } from "@react-query-firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import { ButtonCssStyle } from "../../theme/styles";
+import { ButtonCssStyle } from "../../../theme/styles";
 
 const CriarPersonagemContainer: React.FC = () => {
   const { control, handleSubmit } = useForm<ControlFormData>({
