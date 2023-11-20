@@ -3,6 +3,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { auth } from "../../firebase/firebase.utils";
+import { ButtonCssStyle } from "../../theme/styles";
+
+type GridArea = "login" | "enigma-sol-oculto" | "uivo-do-lobisomem";
 
 const MainPageContainer: React.FC = () => {
   const mutation = useAuthSignOut(auth);
@@ -21,17 +24,28 @@ const MainPageContainer: React.FC = () => {
     return (
       <MainPageWrapper>
         <MainPageTitle>Ficha Personagem</MainPageTitle>
-        <MainPageLink to="/login">Login</MainPageLink>
+        <MainPageLink to="/login" gridArea="login">
+          Login
+        </MainPageLink>
       </MainPageWrapper>
     );
   }
   return (
     <MainPageWrapper>
       <MainPageTitle>Ficha Personagem</MainPageTitle>
-      <MainPageLink to="/enigma-sol-oculto/personagem">
+      <MainPageLink
+        to="/enigma-sol-oculto/personagem"
+        gridArea="enigma-sol-oculto"
+      >
         O Enigma do Sol Oculto
       </MainPageLink>
-      <button onClick={() => mutation.mutate()}>deslogar</button>
+      <MainPageLink
+        to="/uivo-do-lobisomem/personagem"
+        gridArea="uivo-do-lobisomem"
+      >
+        Uivo do Lobisomem
+      </MainPageLink>
+      <LogoutButton onClick={() => mutation.mutate()}>deslogar</LogoutButton>
     </MainPageWrapper>
   );
 };
@@ -60,18 +74,17 @@ const MainPageTitle = styled.h2`
   grid-area: title;
 `;
 
-const MainPageLink = styled(Link)`
-  grid-area: login;
-  text-decoration: none;
-  background-color: #310303;
-  color: white;
-  font-weight: bold;
-  text-align: center;
-  padding: 20px 0px;
-  margin: 0 auto;
-  text-transform: uppercase;
-  width: 300px;
-  align-self: center;
+const MainPageLink = styled(Link)<{
+  gridArea: GridArea;
+}>`
+  grid-area: ${({ gridArea }) => gridArea};
+  ${ButtonCssStyle}
+`;
+
+const LogoutButton = styled.button`
+  ${ButtonCssStyle}
+  border: none;
+  cursor: pointer;
 `;
 
 export default MainPageContainer;

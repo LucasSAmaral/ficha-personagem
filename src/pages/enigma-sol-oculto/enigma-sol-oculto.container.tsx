@@ -7,6 +7,7 @@ import { auth, firestore } from "../../firebase/firebase.utils";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Loading from "./components/loading-component";
+import { ButtonCssStyle } from "../../theme/styles";
 
 const EnigmaSolOcultoContainer: React.FC = () => {
   const navigate = useNavigate();
@@ -121,16 +122,7 @@ const PersonagemWrapper = styled.div`
 
 const CriarPersonagem = styled(Link)`
   grid-area: criarPersonagem;
-  text-decoration: none;
-  background-color: #310303;
-  color: white;
-  font-weight: bold;
-  text-align: center;
-  padding: 20px 0px;
-  margin: 0 auto;
-  text-transform: uppercase;
-  width: 300px;
-  align-self: center;
+  ${ButtonCssStyle}
 `;
 
 export default EnigmaSolOcultoContainer;
