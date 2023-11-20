@@ -1,7 +1,7 @@
 import { useAuthSignOut, useAuthUser } from "@react-query-firebase/auth";
 import React from "react";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { auth } from "../../firebase/firebase.utils";
 import { ButtonCssStyle } from "../../theme/styles";
 
@@ -22,7 +22,7 @@ const MainPageContainer: React.FC = () => {
 
   if (!auth.currentUser) {
     return (
-      <MainPageWrapper>
+      <MainPageWrapper isUserLoggedIn={Boolean(auth.currentUser)}>
         <MainPageTitle>Ficha Personagem</MainPageTitle>
         <MainPageLink to="/login" gridArea="login">
           Login
@@ -31,7 +31,7 @@ const MainPageContainer: React.FC = () => {
     );
   }
   return (
-    <MainPageWrapper>
+    <MainPageWrapper isUserLoggedIn={Boolean(auth.currentUser)}>
       <MainPageTitle>Ficha Personagem</MainPageTitle>
       <MainPageLink
         to="/enigma-sol-oculto/personagem"
@@ -44,7 +44,7 @@ const MainPageContainer: React.FC = () => {
   );
 };
 
-export const MainPageWrapper = styled.div`
+export const MainPageWrapper = styled.div<{ isUserLoggedIn?: boolean }>`
   max-width: 600px;
   width: 100%;
   margin: 0 auto;
@@ -52,11 +52,22 @@ export const MainPageWrapper = styled.div`
   padding-top: 50px;
 
   display: grid;
-  grid-template-areas:
-    "title"
-    "login";
+  ${({ isUserLoggedIn }) =>
+    isUserLoggedIn
+      ? css`
+          grid-template-areas:
+            "title"
+            "enigma-sol-oculto";
+        `
+      : css`
+          grid-template-areas:
+            "title"
+            "login";
+        `}
   align-items: center;
   text-align: center;
+  grid-template-rows: repeat(2, 57px);
+  grid-gap: 30px;
 
   @media (max-width: 425px) {
     grid-template-rows: 125px;
