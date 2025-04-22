@@ -1,160 +1,146 @@
 import {
-  useFirestoreDocumentData,
-  useFirestoreDocumentMutation
+	useFirestoreDocumentData,
+	useFirestoreDocumentMutation,
 } from "@react-query-firebase/firestore";
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { MainPageWrapper } from "../main/Main.container";
 import { doc } from "firebase/firestore";
-import { auth, firestore } from "../../firebase/firebase.utils";
+// biome-ignore lint/style/useImportType: <explanation>
+import React from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import PersonagemNumberProp from "./components/personagem-number-prop.component";
+import styled from "styled-components";
+import { auth, firestore } from "../../firebase/firebase.utils";
+import { ButtonCssStyle } from "../../theme/styles";
+import { MainPageWrapper } from "../main/Main.container";
+import Loading from "./components/loading-component";
 import PersonagemArrayProp from "./components/personagem-array-prop.component";
 import Notas from "./components/personagem-notas.component";
-import UltimoParagrafo from "./components/personagem-ultimo-paragrafo.component";
+import PersonagemNumberProp from "./components/personagem-number-prop.component";
 import Status from "./components/personagem-status.component";
-import Loading from "./components/loading-component";
-import { ButtonCssStyle } from "../../theme/styles";
+import UltimoParagrafo from "./components/personagem-ultimo-paragrafo.component";
 
 export type PersonagemStateProps = {
-  Nome: string;
-  dinheiro: number;
-  equipamento: Array<string>;
-  morto: boolean;
-  notas: string;
-  sanidade: number;
-  saude: number;
-  tracos: Array<string>;
-  ultimoParagrafo: string;
+	Nome: string;
+	dinheiro: number;
+	equipamento: Array<string>;
+	morto: boolean;
+	notas: string;
+	sanidade: number;
+	saude: number;
+	tracos: Array<string>;
+	ultimoParagrafo: string;
 };
 
 export type PersonagemProps = {
-  personagem: PersonagemStateProps;
-  setPersonagem: React.Dispatch<React.SetStateAction<PersonagemStateProps>>;
+	personagem: PersonagemStateProps;
+	setPersonagem: React.Dispatch<React.SetStateAction<PersonagemStateProps>>;
 };
 
 const initialState: PersonagemStateProps = {
-  Nome: "",
-  dinheiro: 0,
-  equipamento: [],
-  morto: false,
-  notas: "",
-  sanidade: 0,
-  saude: 0,
-  tracos: [],
-  ultimoParagrafo: ""
+	Nome: "",
+	dinheiro: 0,
+	equipamento: [],
+	morto: false,
+	notas: "",
+	sanidade: 0,
+	saude: 0,
+	tracos: [],
+	ultimoParagrafo: "",
 };
 
 const EnigmaSolOcultoPersonagem: React.FC = () => {
-  const { nomePersonagem } = useParams<{ nomePersonagem: string }>();
-  const safeNomePersonagem = nomePersonagem ? nomePersonagem : "";
-  const userId = auth.currentUser ? auth.currentUser.uid : "";
-  const ref = doc(
-    firestore,
-    "enigma-sol-oculto-fichas",
-    `${userId}__${safeNomePersonagem}`
-  );
-  const personagemQueryResult = useFirestoreDocumentData(
-    ["enigma-sol-oculto-fichas", `${userId}__${safeNomePersonagem}`],
-    ref,
-    { subscribe: true }
-  );
+	const { nomePersonagem } = useParams<{ nomePersonagem: string }>();
+	const safeNomePersonagem = nomePersonagem ? nomePersonagem : "";
+	const userId = auth.currentUser ? auth.currentUser.uid : "";
+	const ref = doc(
+		firestore,
+		"enigma-sol-oculto-fichas",
+		`${userId}__${safeNomePersonagem}`,
+	);
+	const { data: personagemData, isLoading: isLoadingPersonagem } =
+		useFirestoreDocumentData(
+			["enigma-sol-oculto-fichas", `${userId}__${safeNomePersonagem}`],
+			ref,
+			{ subscribe: true },
+		);
 
-  const personagemMutation = useFirestoreDocumentMutation(ref);
+	const { mutate: savePersonagem, isLoading: isLoadingSavePersonagem } =
+		useFirestoreDocumentMutation(ref);
 
-  const [personagem, setPersonagem] = useState<PersonagemStateProps>(
-    initialState
-  );
+	const [personagem, setPersonagem] =
+		useState<PersonagemStateProps>(initialState);
 
-  const {
-    Nome,
-    dinheiro,
-    equipamento,
-    morto,
-    notas,
-    sanidade,
-    saude,
-    tracos,
-    ultimoParagrafo
-  } = personagem;
+	const { Nome, ...restPersonagem } = personagem;
 
-  useEffect(() => {
-    if (personagemQueryResult.data) {
-      setPersonagem({
-        ...(personagemQueryResult.data as PersonagemStateProps)
-      });
-    }
-    // @ts-ignore
-  }, [personagemQueryResult.data]);
+	useEffect(() => {
+		if (personagemData) {
+			setPersonagem({
+				...(personagemData as PersonagemStateProps),
+			});
+		}
+	}, [personagemData]);
 
-  if (personagemQueryResult.isLoading || personagemMutation.isLoading) {
-    return <Loading>Loading...</Loading>;
-  }
+	if (isLoadingPersonagem || isLoadingSavePersonagem) {
+		return <Loading>Loading...</Loading>;
+	}
 
-  return (
-    <PersonagemWrapper>
-      <PersonagemNome>{Nome}</PersonagemNome>
+	return (
+		<PersonagemWrapper>
+			<PersonagemNome>{Nome}</PersonagemNome>
 
-      <PersonagemNumberProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Saúde Atual:"
-        prop="saude"
-      />
+			<PersonagemNumberProp
+				personagem={personagem}
+				setPersonagem={setPersonagem}
+				title="Saúde Atual:"
+				prop="saude"
+			/>
 
-      <PersonagemNumberProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Sanidade Atual:"
-        prop="sanidade"
-      />
+			<PersonagemNumberProp
+				personagem={personagem}
+				setPersonagem={setPersonagem}
+				title="Sanidade Atual:"
+				prop="sanidade"
+			/>
 
-      <PersonagemArrayProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Traços:"
-        prop="tracos"
-      />
+			<PersonagemArrayProp
+				personagem={personagem}
+				setPersonagem={setPersonagem}
+				title="Traços:"
+				prop="tracos"
+			/>
 
-      <PersonagemArrayProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Equipamentos:"
-        prop="equipamento"
-      />
+			<PersonagemArrayProp
+				personagem={personagem}
+				setPersonagem={setPersonagem}
+				title="Equipamentos:"
+				prop="equipamento"
+			/>
 
-      <PersonagemNumberProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Libras:"
-        prop="dinheiro"
-      />
+			<PersonagemNumberProp
+				personagem={personagem}
+				setPersonagem={setPersonagem}
+				title="Libras:"
+				prop="dinheiro"
+			/>
 
-      <Notas personagem={personagem} setPersonagem={setPersonagem} />
+			<Notas personagem={personagem} setPersonagem={setPersonagem} />
 
-      <Status personagem={personagem} setPersonagem={setPersonagem} />
+			<Status personagem={personagem} setPersonagem={setPersonagem} />
 
-      <UltimoParagrafo personagem={personagem} setPersonagem={setPersonagem} />
+			<UltimoParagrafo personagem={personagem} setPersonagem={setPersonagem} />
 
-      <SalvarPersonagem
-        onClick={() =>
-          personagemMutation.mutate({
-            Nome,
-            dinheiro,
-            equipamento,
-            morto,
-            notas,
-            sanidade,
-            saude,
-            tracos,
-            ultimoParagrafo
-          })
-        }
-      >
-        Salvar Personagem
-      </SalvarPersonagem>
-    </PersonagemWrapper>
-  );
+			<SalvarPersonagem
+				onClick={() =>
+					savePersonagem({
+						Nome,
+						...restPersonagem,
+						userId,
+					})
+				}
+			>
+				Salvar Personagem
+			</SalvarPersonagem>
+		</PersonagemWrapper>
+	);
 };
 
 const PersonagemWrapper = styled(MainPageWrapper)`
@@ -187,7 +173,7 @@ const PersonagemWrapper = styled(MainPageWrapper)`
 `;
 
 const PersonagemNome = styled.h2`
-  font-size: ${props => props.theme.titleFontSize};
+  font-size: ${(props) => props.theme.titleFontSize};
   grid-area: nome;
 `;
 
