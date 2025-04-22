@@ -1,7 +1,7 @@
 import { useFirestoreQueryData } from "@react-query-firebase/firestore";
 import { collection, query } from "firebase/firestore";
 // biome-ignore lint/style/useImportType: <explanation>
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -13,13 +13,17 @@ import Loading from "./components/loading-component";
 const EnigmaSolOcultoContainer: React.FC = () => {
 	const navigate = useNavigate();
 	const ref = query(collection(firestore, "enigma-sol-oculto-fichas"));
-	const { data, status } = useFirestoreQueryData(
+	const { data, status, refetch } = useFirestoreQueryData(
 		["enigma-sol-oculto-fichas"],
 		ref,
 		{
 			subscribe: true,
 		},
 	);
+
+	useEffect(() => {
+		refetch();
+	}, [refetch]);
 
 	const userId = auth.currentUser ? auth.currentUser.uid : "";
 
