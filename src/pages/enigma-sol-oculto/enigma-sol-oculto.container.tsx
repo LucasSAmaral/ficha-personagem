@@ -1,74 +1,77 @@
-import React from "react";
-import styled from "styled-components";
 import { useFirestoreQueryData } from "@react-query-firebase/firestore";
-import { MainPageWrapper } from "../main/Main.container";
-import { query, collection } from "firebase/firestore";
-import { auth, firestore } from "../../firebase/firebase.utils";
+import { collection, query } from "firebase/firestore";
+// biome-ignore lint/style/useImportType: <explanation>
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import Loading from "./components/loading-component";
+import styled from "styled-components";
+import { auth, firestore } from "../../firebase/firebase.utils";
 import { ButtonCssStyle } from "../../theme/styles";
+import { MainPageWrapper } from "../main/Main.container";
+import Loading from "./components/loading-component";
 
 const EnigmaSolOcultoContainer: React.FC = () => {
-  const navigate = useNavigate();
-  const ref = query(collection(firestore, "enigma-sol-oculto-fichas"));
-  const fichasQueryData = useFirestoreQueryData(
-    ["enigma-sol-oculto-fichas"],
-    ref,
-    {
-      subscribe: true
-    }
-  );
+	const navigate = useNavigate();
+	const ref = query(collection(firestore, "enigma-sol-oculto-fichas"));
+	const { data, status, refetch } = useFirestoreQueryData(
+		["enigma-sol-oculto-fichas"],
+		ref,
+		{
+			subscribe: true,
+		},
+	);
 
-  const userId = auth.currentUser ? auth.currentUser.uid : "";
+	useEffect(() => {
+		refetch();
+	}, [refetch]);
 
-  const { data, status } = fichasQueryData;
+	const userId = auth.currentUser ? auth.currentUser.uid : "";
 
-  if (!data) {
-    return null;
-  }
+	if (!data) {
+		return null;
+	}
 
-  const personagensByUser = data.filter(d => d.userId === userId);
+	const personagensByUser = data.filter((d) => d.userId === userId);
 
-  switch (status as "idle" | "error" | "loading" | "success") {
-    case "loading":
-    case "idle":
-      return (
-        <Loading>
-          <h2>Loading...</h2>
-        </Loading>
-      );
-    case "error":
-      return <ErrorMessage>Erro ao mostrar lista de personagens</ErrorMessage>;
-    case "success":
-      return (
-        <EnigmaWrapper>
-          <PersonagemTitle>Personagens</PersonagemTitle>
-          <PersonagemContent>
-            {personagensByUser.map((personagem, index) => (
-              <PersonagemWrapper
-                key={index}
-                onClick={() => {
-                  const personagemNome = personagem.Nome as string;
-                  const safePersonagemNome = personagemNome.replace(" ", "_");
-                  navigate(`${safePersonagemNome}`);
-                }}
-              >
-                <p>{personagem.Nome}</p>
-                <p>Saúde: {personagem.saude}</p>
-                <p>Sanidade: {personagem.sanidade}</p>
-                <p>Dinheiro: {personagem.dinheiro}</p>
-                <p>Morto: {personagem.morto ? "sim" : "não"}</p>
-                <p>Último Parágrafo: {personagem.ultimoParagrafo}</p>
-              </PersonagemWrapper>
-            ))}
-          </PersonagemContent>
-          <CriarPersonagem to="/enigma-sol-oculto/personagem/criar">
-            Criar Personagem
-          </CriarPersonagem>
-        </EnigmaWrapper>
-      );
-  }
+	switch (status as "idle" | "error" | "loading" | "success") {
+		case "loading":
+		case "idle":
+			return (
+				<Loading>
+					<h2>Loading...</h2>
+				</Loading>
+			);
+		case "error":
+			return <ErrorMessage>Erro ao mostrar lista de personagens</ErrorMessage>;
+		case "success":
+			return (
+				<EnigmaWrapper>
+					<PersonagemTitle>Personagens</PersonagemTitle>
+					<PersonagemContent>
+						{personagensByUser.map((personagem, index) => (
+							<PersonagemWrapper
+								key={`${personagem.Nome}-${index}`}
+								onClick={() => {
+									const personagemNome = personagem.Nome as string;
+									const safePersonagemNome = personagemNome.replace(" ", "_");
+									navigate(`${safePersonagemNome}`);
+								}}
+							>
+								<p>{personagem.Nome}</p>
+								<p>Saúde: {personagem.saude}</p>
+								<p>Sanidade: {personagem.sanidade}</p>
+								<p>Dinheiro: {personagem.dinheiro}</p>
+								<p>Morto: {personagem.morto ? "sim" : "não"}</p>
+								<p>Último Parágrafo: {personagem.ultimoParagrafo}</p>
+							</PersonagemWrapper>
+						))}
+					</PersonagemContent>
+					<CriarPersonagem to="/enigma-sol-oculto/personagem/criar">
+						Criar Personagem
+					</CriarPersonagem>
+				</EnigmaWrapper>
+			);
+	}
 };
 
 const ErrorMessage = styled(Loading)`
@@ -94,7 +97,7 @@ const EnigmaWrapper = styled(MainPageWrapper)`
 `;
 
 const PersonagemTitle = styled.h2`
-  font-size: ${props => props.theme.titleFontSize};
+  font-size: ${(props) => props.theme.titleFontSize};
   grid-area: title;
 `;
 
