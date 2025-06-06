@@ -1,118 +1,118 @@
 import { useFirestoreDocumentMutation } from "@react-query-firebase/firestore";
 import { doc } from "firebase/firestore";
-// biome-ignore lint/style/useImportType: <explanation>
 import React from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import FormInputComponent, {
-	type ControlFormData,
+  ControlFormData
 } from "../../../components/FormInput.component";
 import { auth, firestore } from "../../../firebase/firebase.utils";
 import { ButtonCssStyle } from "../../../theme/styles";
 import { MainPageWrapper } from "../../main/Main.container";
 
 const CriarPersonagemContainer: React.FC = () => {
-	const { control, handleSubmit } = useForm<ControlFormData>({
-		mode: "onSubmit",
-	});
+  const { control, handleSubmit } = useForm<ControlFormData>({
+    mode: "onSubmit"
+  });
 
-	const navigate = useNavigate();
+  const navigate = useNavigate();
 
-	const [novoNome, setNovoNome] = useState("inicial");
+  const [novoNome, setNovoNome] = useState("inicial");
 
-	const userId = auth.currentUser ? auth.currentUser.uid : "";
+  const userId = auth.currentUser ? auth.currentUser.uid : "";
 
-	const safeNovoNome = novoNome.replace(" ", "_");
+  const safeNovoNome = novoNome.replace(" ", "_");
 
-	const ref = doc(
-		firestore,
-		"enigma-sol-oculto-fichas",
-		`${userId}__${safeNovoNome}`,
-	);
+  const ref = doc(
+    firestore,
+    "enigma-sol-oculto-fichas",
+    `${userId}__${safeNovoNome}`
+  );
 
-	const { isLoading, mutate: createPersonagem } =
-		useFirestoreDocumentMutation(ref);
+  const { isLoading, mutate: createPersonagem } = useFirestoreDocumentMutation(
+    ref
+  );
 
-	const onSubmit = handleSubmit((formData) => {
-		if (
-			"Nome" in formData &&
-			"dinheiro" in formData &&
-			"sanidade" in formData &&
-			"saude" in formData
-		) {
-			const { Nome, dinheiro, sanidade, saude } = formData;
+  const onSubmit = handleSubmit(formData => {
+    if (
+      "Nome" in formData &&
+      "dinheiro" in formData &&
+      "sanidade" in formData &&
+      "saude" in formData
+    ) {
+      const { Nome, dinheiro, sanidade, saude } = formData;
 
-			setNovoNome(Nome);
+      setNovoNome(Nome);
 
-			createPersonagem(
-				{
-					Nome,
-					dinheiro: Number.parseInt(dinheiro),
-					equipamento: [],
-					morto: false,
-					notas: "",
-					sanidade: Number.parseInt(sanidade),
-					saude: Number.parseInt(saude),
-					tracos: [],
-					ultimoParagrafo: "",
-					userId,
-				},
-				{
-					onSuccess: () => {
-						navigate("/enigma-sol-oculto/personagem");
-					},
-					onError: () => {
-						alert("Erro ao criar personagem");
-					},
-				},
-			);
-		}
-	});
+      createPersonagem(
+        {
+          Nome,
+          dinheiro: Number.parseInt(dinheiro),
+          equipamento: [],
+          morto: false,
+          notas: "",
+          sanidade: Number.parseInt(sanidade),
+          saude: Number.parseInt(saude),
+          tracos: [],
+          ultimoParagrafo: "",
+          userId
+        },
+        {
+          onSuccess: () => {
+            navigate("/enigma-sol-oculto/personagem");
+          },
+          onError: () => {
+            alert("Erro ao criar personagem");
+          }
+        }
+      );
+    }
+  });
 
-	return (
-		<CriarPersonagemWrapper>
-			<CriarPersonagemTitle>Criar Personagem</CriarPersonagemTitle>
-			<CriarPersonagemForm onSubmit={onSubmit}>
-				<FormInputComponent
-					control={control}
-					name="Nome"
-					label="Nome do Personagem"
-					type="text"
-					required
-				/>
+  return (
+    <CriarPersonagemWrapper>
+      <CriarPersonagemTitle>Criar Personagem</CriarPersonagemTitle>
+      <CriarPersonagemForm onSubmit={onSubmit}>
+        <FormInputComponent
+          control={control}
+          name="Nome"
+          label="Nome do Personagem"
+          type="text"
+          required
+        />
 
-				<FormInputComponent
-					control={control}
-					name="saude"
-					label="Saúde"
-					type="number"
-					required
-				/>
+        <FormInputComponent
+          control={control}
+          name="saude"
+          label="Saúde"
+          type="number"
+          required
+        />
 
-				<FormInputComponent
-					control={control}
-					name="sanidade"
-					label="Sanidade"
-					type="number"
-					required
-				/>
+        <FormInputComponent
+          control={control}
+          name="sanidade"
+          label="Sanidade"
+          type="number"
+          required
+        />
 
-				<FormInputComponent
-					control={control}
-					name="dinheiro"
-					label="Dinheiro"
-					type="number"
-					required
-				/>
-				{isLoading && "Loading..."}
-				<CriarPersonagemButton type="submit">
-					Criar Personagem
-				</CriarPersonagemButton>
-			</CriarPersonagemForm>
-		</CriarPersonagemWrapper>
-	);
+        <FormInputComponent
+          control={control}
+          name="dinheiro"
+          label="Dinheiro"
+          type="number"
+          required
+        />
+        {isLoading && "Loading..."}
+        <CriarPersonagemButton type="submit">
+          Criar Personagem
+        </CriarPersonagemButton>
+      </CriarPersonagemForm>
+    </CriarPersonagemWrapper>
+  );
 };
 
 const CriarPersonagemWrapper = styled(MainPageWrapper)`
@@ -123,7 +123,7 @@ const CriarPersonagemWrapper = styled(MainPageWrapper)`
 `;
 
 const CriarPersonagemTitle = styled.h2`
-  font-size: ${(props) => props.theme.titleFontSize};
+  font-size: ${props => props.theme.titleFontSize};
   grid-area: title;
 `;
 
