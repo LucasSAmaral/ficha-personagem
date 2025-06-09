@@ -11,4 +11,5 @@ export const ButtonCssStyle = css`
   text-transform: uppercase;
   width: 300px;
   align-self: center;
+  border-radius: 8px;
 `;

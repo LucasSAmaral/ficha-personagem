@@ -5,7 +5,7 @@ import {
 import { doc } from "firebase/firestore";
 import React from "react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { auth, firestore } from "../../firebase/firebase.utils";
 import { ButtonCssStyle } from "../../theme/styles";
@@ -48,6 +48,8 @@ const initialState: PersonagemStateProps = {
 
 const EnigmaSolOcultoPersonagem: React.FC = () => {
   const { nomePersonagem } = useParams<{ nomePersonagem: string }>();
+  const navigate = useNavigate();
+
   const safeNomePersonagem = nomePersonagem ? nomePersonagem : "";
   const userId = auth.currentUser ? auth.currentUser.uid : "";
   const ref = doc(
@@ -132,6 +134,8 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
 
       <UltimoParagrafo personagem={personagem} setPersonagem={setPersonagem} />
 
+      <Voltar onClick={() => navigate(-1)}>Voltar</Voltar>
+
       <SalvarPersonagem
         onClick={() =>
           savePersonagem({
@@ -154,7 +158,7 @@ const PersonagemWrapper = styled(MainPageWrapper)`
     "tracos tracos equipamento equipamento"
     "notas notas ultParagrafo ultParagrafo"
     "dinheiro dinheiro status status"
-    ". salvar salvar .";
+    "voltar voltar salvar salvar";
   column-gap: 30px;
   padding-top: 0;
   grid-template-rows: auto;
@@ -170,7 +174,8 @@ const PersonagemWrapper = styled(MainPageWrapper)`
       "ultParagrafo"
       "dinheiro"
       "status"
-      "salvar";
+      "salvar"
+      "voltar";
     justify-content: center;
     margin-bottom: 50px;
   }
@@ -183,6 +188,17 @@ const PersonagemNome = styled.h2`
 
 const SalvarPersonagem = styled.button`
   grid-area: salvar;
+  cursor: pointer;
+  border: none;
+  ${ButtonCssStyle}
+
+  @media (max-width: 425px) {
+    margin-top: 20px;
+  }
+`;
+
+const Voltar = styled.button`
+  grid-area: voltar;
   cursor: pointer;
   border: none;
   ${ButtonCssStyle}
