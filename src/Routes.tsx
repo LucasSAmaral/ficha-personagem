@@ -30,6 +30,7 @@ function AppRoutes() {
             path="uivo-do-lobisomem/personagem"
             element={<>Quase lá...</>}
           />
+          <Route path="sobre-a-aplicacao" element={<>Sobre a Aplicação</>} />
         </Route>
       </Routes>
     </BrowserRouter>

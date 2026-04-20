@@ -5,7 +5,7 @@ import styled, { css } from "styled-components";
 import { auth } from "../../firebase/firebase.utils";
 import { ButtonCssStyle } from "../../theme/styles";
 
-type GridArea = "login" | "enigma-sol-oculto" | "uivo-do-lobisomem";
+type GridArea = "login" | "enigma-sol-oculto" | "uivo-do-lobisomem" | "sobre-a-aplicacao";
 
 const MainPageContainer: React.FC = () => {
   const mutation = useAuthSignOut(auth);
@@ -45,6 +45,12 @@ const MainPageContainer: React.FC = () => {
       >
         Uivo do Lobisomem
       </MainPageLink>
+      <MainPageLink
+        to="/sobre-a-aplicacao"
+        gridArea="sobre-a-aplicacao"
+      >
+        Sobre a aplicação
+      </MainPageLink>
       <LogoutButton onClick={() => mutation.mutate()}>deslogar</LogoutButton>
     </MainPageWrapper>
   );
@@ -64,7 +70,8 @@ export const MainPageWrapper = styled.div<{ isUserLoggedIn?: boolean }>`
           grid-template-areas:
             "title"
             "enigma-sol-oculto"
-            "uivo-do-lobisomem";
+            "uivo-do-lobisomem"
+            "sobre-a-aplicacao";
         `
       : css`
           grid-template-areas:
