@@ -1,6 +1,6 @@
 {
   "name": "ficha-personagem",
-  "version": "0.1.10",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@react-query-firebase/auth": "^0.3.4",
