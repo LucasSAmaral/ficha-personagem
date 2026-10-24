@@ -6,6 +6,8 @@ import EnigmaSolOcultoContainer from "./pages/enigma-sol-oculto/enigma-sol-ocult
 import LoginContainer from "./pages/login/Login.container";
 import MainPageContainer from "./pages/main/Main.container";
 import SignUpContainer from "./pages/sign-up/SignUp.container";
+import ThemeScope from "./components/ThemeScope.component";
+
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -15,17 +17,23 @@ function AppRoutes() {
           <Route path="login" element={<LoginContainer />} />
           <Route path="sign-up" element={<SignUpContainer />} />
           <Route
-            path="enigma-sol-oculto/personagem"
-            element={<EnigmaSolOcultoContainer />}
-          />
-          <Route
-            path="enigma-sol-oculto/personagem/criar"
-            element={<CriarPersonagemContainer />}
-          />
-          <Route
-            path="enigma-sol-oculto/personagem/:nomePersonagem"
-            element={<EnigmaSolOcultoPersonagem />}
-          />
+            path="enigma-sol-oculto"
+            element={
+              <ThemeScope theme="sol-oculto">
+                <Outlet />
+              </ThemeScope>
+            }
+          >
+            <Route path="personagem" element={<EnigmaSolOcultoContainer />} />
+            <Route
+              path="personagem/criar"
+              element={<CriarPersonagemContainer />}
+            />
+            <Route
+              path="personagem/:nomePersonagem"
+              element={<EnigmaSolOcultoPersonagem />}
+            />
+          </Route>
           <Route
             path="uivo-do-lobisomem/personagem"
             element={<>Quase lá...</>}

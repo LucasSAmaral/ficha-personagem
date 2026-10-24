@@ -1,16 +1,16 @@
 import { useFirestoreQueryData } from "@react-query-firebase/firestore";
 import { collection, query } from "firebase/firestore";
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { ButtonLink } from "../../components/Button.component";
+import Loading from "../../components/Loading.component";
+import Page from "../../components/Page.component";
+import PageHeader from "../../components/PageHeader.component";
 import { auth, firestore } from "../../firebase/firebase.utils";
-import { ButtonCssStyle } from "../../theme/styles";
-import { MainPageWrapper } from "../main/Main.container";
-import Loading from "./components/loading-component";
+import { FocusCssStyle, LabelCssStyle, media } from "../../theme/tokens";
 
 const EnigmaSolOcultoContainer: React.FC = () => {
-  const navigate = useNavigate();
   const ref = query(collection(firestore, "enigma-sol-oculto-fichas"));
   const { data, status, refetch } = useFirestoreQueryData(
     ["enigma-sol-oculto-fichas"],
@@ -26,106 +26,215 @@ const EnigmaSolOcultoContainer: React.FC = () => {
 
   const userId = auth.currentUser ? auth.currentUser.uid : "";
 
-  if (!data) {
-    return null;
+  if (status === "loading" || status === "idle") {
+    return <Loading fullPage>Abrindo os arquivos</Loading>;
   }
 
-  const personagensByUser = data.filter(d => d.userId === userId);
+  const personagensByUser = data ? data.filter(d => d.userId === userId) : [];
 
-  switch (status as "idle" | "error" | "loading" | "success") {
-    case "loading":
-    case "idle":
-      return (
-        <Loading>
-          <h2>Loading...</h2>
-        </Loading>
-      );
-    case "error":
-      return <ErrorMessage>Erro ao mostrar lista de personagens</ErrorMessage>;
-    case "success":
-      return (
-        <EnigmaWrapper>
-          <PersonagemTitle>Personagens</PersonagemTitle>
-          <PersonagemContent>
-            {personagensByUser.map((personagem, index) => (
-              <PersonagemWrapper
+  return (
+    <Page>
+      <PageHeader
+        back={{ to: "/", label: "Estante" }}
+        eyebrow="Investigadores"
+        title="O Enigma do Sol Oculto"
+      />
+
+      {status === "error" && (
+        <ErrorMessage role="alert">
+          Não foi possível carregar os investigadores. Verifique a conexão e
+          recarregue a página.
+        </ErrorMessage>
+      )}
+
+      {status === "success" && personagensByUser.length === 0 && (
+        <EmptyMessage>
+          Nenhum investigador ainda. Crie o primeiro para abrir o caso.
+        </EmptyMessage>
+      )}
+
+      {personagensByUser.length > 0 && (
+        <PersonagemContent>
+          {personagensByUser.map((personagem, index) => {
+            const personagemNome = personagem.Nome as string;
+            const safePersonagemNome = personagemNome.replace(" ", "_");
+            return (
+              <PersonagemCard
                 key={`${personagem.Nome}-${index}`}
-                onClick={() => {
-                  const personagemNome = personagem.Nome as string;
-                  const safePersonagemNome = personagemNome.replace(" ", "_");
-                  navigate(`${safePersonagemNome}`);
-                }}
+                to={safePersonagemNome}
               >
-                <p>{personagem.Nome}</p>
-                <p>Saúde: {personagem.saude}</p>
-                <p>Sanidade: {personagem.sanidade}</p>
-                <p>Dinheiro: {personagem.dinheiro}</p>
-                <p>Morto: {personagem.morto ? "sim" : "não"}</p>
-                <p>Último Parágrafo: {personagem.ultimoParagrafo}</p>
-              </PersonagemWrapper>
-            ))}
-          </PersonagemContent>
-          <CriarPersonagem to="/enigma-sol-oculto/personagem/criar">
-            Criar Personagem
-          </CriarPersonagem>
-        </EnigmaWrapper>
-      );
-  }
+                <PersonagemCardNome>{personagem.Nome}</PersonagemCardNome>
+                <PersonagemCardStats>
+                  <div>
+                    <dt>Saúde</dt>
+                    <PersonagemCardValue
+                      $color={
+                        personagem.morto
+                          ? "var(--ink-muted)"
+                          : "var(--stat-vital)"
+                      }
+                    >
+                      {personagem.saude}
+                    </PersonagemCardValue>
+                  </div>
+                  <div>
+                    <dt>Sanidade</dt>
+                    <PersonagemCardValue
+                      $color={
+                        personagem.morto
+                          ? "var(--ink-muted)"
+                          : "var(--stat-mind)"
+                      }
+                    >
+                      {personagem.sanidade}
+                    </PersonagemCardValue>
+                  </div>
+                  <div>
+                    <dt>Libras</dt>
+                    <PersonagemCardValue
+                      $color={
+                        personagem.morto
+                          ? "var(--ink-muted)"
+                          : "var(--stat-coin)"
+                      }
+                    >
+                      {personagem.dinheiro}
+                    </PersonagemCardValue>
+                  </div>
+                </PersonagemCardStats>
+                <PersonagemCardMeta>
+                  Último parágrafo{" "}
+                  <b>
+                    {personagem.ultimoParagrafo
+                      ? `§ ${personagem.ultimoParagrafo}`
+                      : "—"}
+                  </b>
+                </PersonagemCardMeta>
+                {personagem.morto && (
+                  <PersonagemCardStamp>Morto</PersonagemCardStamp>
+                )}
+              </PersonagemCard>
+            );
+          })}
+        </PersonagemContent>
+      )}
+
+      <CriarPersonagem to="/enigma-sol-oculto/personagem/criar">
+        Novo investigador
+      </CriarPersonagem>
+    </Page>
+  );
 };
 
-const ErrorMessage = styled(Loading)`
-  color: red;
+const ErrorMessage = styled.p`
+  color: var(--danger);
 `;
 
-const EnigmaWrapper = styled(MainPageWrapper)`
-  grid-template-areas:
-    "title title title title"
-    "conteudo conteudo conteudo conteudo"
-    ". criarPersonagem criarPersonagem .";
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: auto;
-
-  @media (max-width: 425px) {
-    grid-template-areas:
-      "title"
-      "conteudo"
-      "criarPersonagem";
-    grid-template-columns: 1fr;
-    row-gap: 1rem;
-  }
-`;
-
-const PersonagemTitle = styled.h2`
-  font-size: ${props => props.theme.titleFontSize};
-  grid-area: title;
+const EmptyMessage = styled.p`
+  font-style: italic;
+  color: var(--ink-muted);
 `;
 
 const PersonagemContent = styled.div`
-  grid-area: conteudo;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  column-gap: 15px;
-  row-gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-sm);
 
-  @media (max-width: 425px) {
-    grid-template-columns: 1fr;
-    justify-items: center;
+  ${media.mobile} {
+    grid-template-columns: minmax(0, 1fr);
   }
 `;
 
-const PersonagemWrapper = styled.div`
-  border: 1px solid black;
-  cursor: pointer;
-  padding: 10px;
+const PersonagemCardStats = styled.dl`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-xs);
 
-  @media (max-width: 425px) {
-    width: 200px;
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  dt {
+    ${LabelCssStyle}
+    font-size: 13px;
+    line-height: 16px;
   }
 `;
 
-const CriarPersonagem = styled(Link)`
-  grid-area: criarPersonagem;
-  ${ButtonCssStyle}
+const PersonagemCardValue = styled.dd<{ $color: string }>`
+  font-family: var(--fp-stat-font);
+  font-weight: var(--fp-stat-weight);
+  font-size: 24px;
+  line-height: 28px;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: ${({ $color }) => $color};
+`;
+
+const PersonagemCard = styled(Link)`
+  ${FocusCssStyle}
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: var(--space-md);
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-top: 4px double var(--line);
+  border-radius: var(--fp-radius);
+  box-shadow: var(--shadow-raised);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+`;
+
+const PersonagemCardNome = styled.h2`
+  padding-right: 90px;
+  font-family: var(--fp-heading-font);
+  font-weight: var(--fp-heading-weight);
+  font-size: 24px;
+  line-height: 30px;
+  overflow-wrap: anywhere;
+`;
+
+const PersonagemCardMeta = styled.span`
+  padding-top: var(--space-xs);
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--ink-muted);
+  border-top: 1px solid var(--hairline);
+
+  b {
+    font-family: var(--fp-stat-font);
+    font-weight: var(--fp-stat-weight);
+    color: var(--ink);
+  }
+`;
+
+const PersonagemCardStamp = styled.span`
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  padding: 2px 8px;
+  font-family: var(--fp-label-font);
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--danger);
+  border: 2px solid var(--danger);
+  border-radius: var(--fp-radius);
+  transform: rotate(var(--fp-stamp-rotate));
+`;
+
+const CriarPersonagem = styled(ButtonLink)`
+  align-self: center;
 `;
 
 export default EnigmaSolOcultoContainer;

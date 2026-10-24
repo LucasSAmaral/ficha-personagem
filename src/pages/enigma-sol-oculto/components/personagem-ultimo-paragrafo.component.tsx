@@ -1,5 +1,10 @@
 import React from "react";
 import styled from "styled-components";
+import {
+  FieldInput,
+  FieldLabel,
+  FieldWrapper
+} from "../../../components/FormInput.component";
 import { PersonagemProps } from "../enigma-sol-oculto-personagem.component";
 
 const PersonagemUltimoParagrafoComponent: React.FC<PersonagemProps> = ({
@@ -8,40 +13,22 @@ const PersonagemUltimoParagrafoComponent: React.FC<PersonagemProps> = ({
 }) => {
   return (
     <PersonagemUltimoParagrafo>
-      <PersonagemUltimoParagrafoTitle>
-        Último Parágrafo:
-      </PersonagemUltimoParagrafoTitle>
-      <PersonagemUltimoParagrafoValueWrapper>
-        <PersonagemUltimoParagrafoInput
-          type="text"
-          value={personagem.ultimoParagrafo}
-          onChange={e =>
-            setPersonagem({ ...personagem, ultimoParagrafo: e.target.value })
-          }
-        />
-      </PersonagemUltimoParagrafoValueWrapper>
+      <FieldLabel htmlFor="campo-ultimo-paragrafo">Último parágrafo</FieldLabel>
+      <FieldInput
+        id="campo-ultimo-paragrafo"
+        type="text"
+        inputMode="numeric"
+        value={personagem.ultimoParagrafo}
+        onChange={e =>
+          setPersonagem({ ...personagem, ultimoParagrafo: e.target.value })
+        }
+      />
     </PersonagemUltimoParagrafo>
   );
 };
 
-const PersonagemUltimoParagrafo = styled.div`
+const PersonagemUltimoParagrafo = styled(FieldWrapper)`
   grid-area: ultParagrafo;
-`;
-
-const PersonagemUltimoParagrafoTitle = styled.p`
-  font-size: 20px;
-`;
-
-const PersonagemUltimoParagrafoValueWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  font-size: 20px;
-  margin-top: 20px;
-`;
-
-const PersonagemUltimoParagrafoInput = styled.input`
-  padding: 10px;
 `;
 
 export default PersonagemUltimoParagrafoComponent;

@@ -5,12 +5,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import Button from "../../../components/Button.component";
 import FormInputComponent, {
   ControlFormData
 } from "../../../components/FormInput.component";
+import Page from "../../../components/Page.component";
+import PageHeader from "../../../components/PageHeader.component";
 import { auth, firestore } from "../../../firebase/firebase.utils";
-import { ButtonCssStyle } from "../../../theme/styles";
-import { MainPageWrapper } from "../../main/Main.container";
 
 const CriarPersonagemContainer: React.FC = () => {
   const { control, handleSubmit } = useForm<ControlFormData>({
@@ -20,6 +21,8 @@ const CriarPersonagemContainer: React.FC = () => {
   const navigate = useNavigate();
 
   const [novoNome, setNovoNome] = useState("inicial");
+
+  const [erro, setErro] = useState("");
 
   const userId = auth.currentUser ? auth.currentUser.uid : "";
 
@@ -45,6 +48,7 @@ const CriarPersonagemContainer: React.FC = () => {
       const { Nome, dinheiro, sanidade, saude } = formData;
 
       setNovoNome(Nome);
+      setErro("");
 
       createPersonagem(
         {
@@ -64,7 +68,9 @@ const CriarPersonagemContainer: React.FC = () => {
             navigate("/enigma-sol-oculto/personagem");
           },
           onError: () => {
-            alert("Erro ao criar personagem");
+            setErro(
+              "Não foi possível criar o investigador. Verifique a conexão e tente de novo."
+            );
           }
         }
       );
@@ -72,69 +78,79 @@ const CriarPersonagemContainer: React.FC = () => {
   });
 
   return (
-    <CriarPersonagemWrapper>
-      <CriarPersonagemTitle>Criar Personagem</CriarPersonagemTitle>
+    <Page>
+      <PageHeader
+        back={{ to: "/enigma-sol-oculto/personagem", label: "Investigadores" }}
+        eyebrow="O Enigma do Sol Oculto"
+        title="Novo investigador"
+      />
       <CriarPersonagemForm onSubmit={onSubmit}>
         <FormInputComponent
           control={control}
           name="Nome"
-          label="Nome do Personagem"
+          label="Nome do investigador"
           type="text"
           required
         />
 
-        <FormInputComponent
-          control={control}
-          name="saude"
-          label="Saúde"
-          type="number"
-          required
-        />
+        <CriarPersonagemStats>
+          <FormInputComponent
+            control={control}
+            name="saude"
+            label="Saúde"
+            type="number"
+            inputMode="numeric"
+            required
+          />
 
-        <FormInputComponent
-          control={control}
-          name="sanidade"
-          label="Sanidade"
-          type="number"
-          required
-        />
+          <FormInputComponent
+            control={control}
+            name="sanidade"
+            label="Sanidade"
+            type="number"
+            inputMode="numeric"
+            required
+          />
 
-        <FormInputComponent
-          control={control}
-          name="dinheiro"
-          label="Dinheiro"
-          type="number"
-          required
-        />
-        {isLoading && "Loading..."}
-        <CriarPersonagemButton type="submit">
-          Criar Personagem
+          <FormInputComponent
+            control={control}
+            name="dinheiro"
+            label="Libras"
+            type="number"
+            inputMode="numeric"
+            required
+          />
+        </CriarPersonagemStats>
+
+        {erro && <ErrorMessage role="alert">{erro}</ErrorMessage>}
+
+        <CriarPersonagemButton type="submit" disabled={isLoading}>
+          {isLoading ? "Criando…" : "Criar investigador"}
         </CriarPersonagemButton>
       </CriarPersonagemForm>
-    </CriarPersonagemWrapper>
+    </Page>
   );
 };
 
-const CriarPersonagemWrapper = styled(MainPageWrapper)`
-  grid-template-areas:
-    "title"
-    "form";
-  grid-template-rows: 60px 350px;
-`;
-
-const CriarPersonagemTitle = styled.h2`
-  font-size: ${props => props.theme.titleFontSize};
-  grid-area: title;
-`;
-
 const CriarPersonagemForm = styled.form`
-  grid-area: form;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 `;
 
-const CriarPersonagemButton = styled.button`
-  cursor: pointer;
-  border: none;
-  ${ButtonCssStyle}
+const CriarPersonagemStats = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-md);
+`;
+
+const ErrorMessage = styled.p`
+  color: var(--danger);
+`;
+
+const CriarPersonagemButton = styled(Button)`
+  align-self: center;
+  margin-top: var(--space-xs);
 `;
 
 export default CriarPersonagemContainer;

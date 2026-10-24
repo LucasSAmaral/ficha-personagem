@@ -5,12 +5,14 @@ import {
 import { doc } from "firebase/firestore";
 import React from "react";
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
+import Button from "../../components/Button.component";
+import Loading from "../../components/Loading.component";
+import Page from "../../components/Page.component";
+import PageHeader from "../../components/PageHeader.component";
 import { auth, firestore } from "../../firebase/firebase.utils";
-import { ButtonCssStyle } from "../../theme/styles";
-import { MainPageWrapper } from "../main/Main.container";
-import Loading from "./components/loading-component";
+import { media } from "../../theme/tokens";
 import PersonagemArrayProp from "./components/personagem-array-prop.component";
 import Notas from "./components/personagem-notas.component";
 import PersonagemNumberProp from "./components/personagem-number-prop.component";
@@ -46,9 +48,10 @@ const initialState: PersonagemStateProps = {
   ultimoParagrafo: ""
 };
 
+type SaveStatus = "idle" | "saved" | "error";
+
 const EnigmaSolOcultoPersonagem: React.FC = () => {
   const { nomePersonagem } = useParams<{ nomePersonagem: string }>();
-  const navigate = useNavigate();
 
   const safeNomePersonagem = nomePersonagem ? nomePersonagem : "";
   const userId = auth.currentUser ? auth.currentUser.uid : "";
@@ -75,6 +78,8 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
     initialState
   );
 
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+
   const { Nome, ...restPersonagem } = personagem;
 
   useEffect(() => {
@@ -85,127 +90,139 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
     }
   }, [personagemData]);
 
-  if (isLoadingPersonagem || isLoadingSavePersonagem) {
-    return <Loading>Loading...</Loading>;
+  useEffect(() => {
+    setSaveStatus("idle");
+  }, [personagem]);
+
+  if (isLoadingPersonagem) {
+    return <Loading fullPage>Abrindo o dossiê</Loading>;
   }
 
+  const onSave = () =>
+    savePersonagem(
+      {
+        Nome,
+        ...restPersonagem,
+        userId
+      },
+      {
+        onSuccess: () => setSaveStatus("saved"),
+        onError: () => setSaveStatus("error")
+      }
+    );
+
   return (
-    <PersonagemWrapper>
-      <PersonagemNome>{Nome}</PersonagemNome>
-
-      <PersonagemNumberProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Saúde Atual:"
-        prop="saude"
+    <Page $wide>
+      <PageHeader
+        back={{ to: "/enigma-sol-oculto/personagem", label: "Investigadores" }}
+        eyebrow="O Enigma do Sol Oculto"
+        title={Nome}
       />
 
-      <PersonagemNumberProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Sanidade Atual:"
-        prop="sanidade"
-      />
+      <PersonagemWrapper>
+        <PersonagemNumberProp
+          personagem={personagem}
+          setPersonagem={setPersonagem}
+          title="Saúde"
+          prop="saude"
+        />
 
-      <PersonagemArrayProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Traços:"
-        prop="tracos"
-      />
+        <PersonagemNumberProp
+          personagem={personagem}
+          setPersonagem={setPersonagem}
+          title="Sanidade"
+          prop="sanidade"
+        />
 
-      <PersonagemArrayProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Equipamentos:"
-        prop="equipamento"
-      />
+        <PersonagemNumberProp
+          personagem={personagem}
+          setPersonagem={setPersonagem}
+          title="Libras"
+          prop="dinheiro"
+        />
 
-      <PersonagemNumberProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Libras:"
-        prop="dinheiro"
-      />
+        <PersonagemArrayProp
+          personagem={personagem}
+          setPersonagem={setPersonagem}
+          title="Traços"
+          prop="tracos"
+        />
 
-      <Notas personagem={personagem} setPersonagem={setPersonagem} />
+        <PersonagemArrayProp
+          personagem={personagem}
+          setPersonagem={setPersonagem}
+          title="Equipamento"
+          prop="equipamento"
+        />
 
-      <Status personagem={personagem} setPersonagem={setPersonagem} />
+        <Notas personagem={personagem} setPersonagem={setPersonagem} />
 
-      <UltimoParagrafo personagem={personagem} setPersonagem={setPersonagem} />
+        <UltimoParagrafo personagem={personagem} setPersonagem={setPersonagem} />
 
-      <Voltar onClick={() => navigate(-1)}>Voltar</Voltar>
+        <Status personagem={personagem} setPersonagem={setPersonagem} />
 
-      <SalvarPersonagem
-        onClick={() =>
-          savePersonagem({
-            Nome,
-            ...restPersonagem,
-            userId
-          })
-        }
-      >
-        Salvar Personagem
-      </SalvarPersonagem>
-    </PersonagemWrapper>
+        <SalvarPersonagem>
+          <Button
+            type="button"
+            disabled={isLoadingSavePersonagem}
+            onClick={onSave}
+          >
+            {isLoadingSavePersonagem ? "Salvando…" : "Salvar ficha"}
+          </Button>
+          <SaveMessage role="status" $error={saveStatus === "error"}>
+            {saveStatus === "saved" && "Ficha salva."}
+            {saveStatus === "error" &&
+              "Não foi possível salvar a ficha. Verifique a conexão e tente de novo."}
+          </SaveMessage>
+        </SalvarPersonagem>
+      </PersonagemWrapper>
+    </Page>
   );
 };
 
-const PersonagemWrapper = styled(MainPageWrapper)`
+const PersonagemWrapper = styled.div`
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   grid-template-areas:
-    "nome nome nome nome"
-    "saude saude sanidade sanidade"
-    "tracos tracos equipamento equipamento"
-    "notas notas ultParagrafo ultParagrafo"
-    "dinheiro dinheiro status status"
-    "voltar voltar salvar salvar";
-  column-gap: 30px;
-  padding-top: 0;
-  grid-template-rows: auto;
+    "saude saude sanidade sanidade dinheiro dinheiro"
+    "tracos tracos tracos equipamento equipamento equipamento"
+    "notas notas notas notas notas notas"
+    "ultParagrafo ultParagrafo ultParagrafo status status status"
+    "salvar salvar salvar salvar salvar salvar";
+  gap: var(--space-lg);
 
-  @media (max-width: 425px) {
+  ${media.mobile} {
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      "nome"
       "saude"
       "sanidade"
+      "dinheiro"
       "tracos"
       "equipamento"
       "notas"
       "ultParagrafo"
-      "dinheiro"
       "status"
-      "salvar"
-      "voltar";
-    justify-content: center;
-    margin-bottom: 50px;
+      "salvar";
+    gap: var(--space-md);
   }
 `;
 
-const PersonagemNome = styled.h2`
-  font-size: ${props => props.theme.titleFontSize};
-  grid-area: nome;
-`;
-
-const SalvarPersonagem = styled.button`
+const SalvarPersonagem = styled.div`
   grid-area: salvar;
-  cursor: pointer;
-  border: none;
-  ${ButtonCssStyle}
-
-  @media (max-width: 425px) {
-    margin-top: 20px;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--hairline);
 `;
 
-const Voltar = styled.button`
-  grid-area: voltar;
-  cursor: pointer;
-  border: none;
-  ${ButtonCssStyle}
-
-  @media (max-width: 425px) {
-    margin-top: 20px;
-  }
+const SaveMessage = styled.p<{ $error: boolean }>`
+  min-height: 20px;
+  font-size: 15px;
+  line-height: 20px;
+  text-align: center;
+  color: ${({ $error }) => ($error ? "var(--danger)" : "var(--ink-muted)")};
 `;
 
 export default EnigmaSolOcultoPersonagem;

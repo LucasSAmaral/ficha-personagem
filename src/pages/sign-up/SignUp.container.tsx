@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { MainPageWrapper } from "../main/Main.container";
 import { useForm } from "react-hook-form";
+import Button from "../../components/Button.component";
 import FormInputComponent, {
-  ControlFormData,
-  FormData
+  ControlFormData
 } from "../../components/FormInput.component";
+import Page from "../../components/Page.component";
+import PageHeader from "../../components/PageHeader.component";
 import { auth, firestore } from "../../firebase/firebase.utils";
 import { useAuthCreateUserWithEmailAndPassword } from "@react-query-firebase/auth";
 import { useFirestoreDocumentMutation } from "@react-query-firebase/firestore";
@@ -21,6 +22,10 @@ const SignUpContainer: React.FC = () => {
 
   const [userUid, setUserUid] = useState("inicial");
 
+  const [erroSenha, setErroSenha] = useState("");
+
+  const [erro, setErro] = useState("");
+
   const {
     mutate: authMutate,
     isLoading
@@ -35,15 +40,22 @@ const SignUpContainer: React.FC = () => {
   const onSubmit = handleSubmit(formData => {
     if (
       "password" in formData &&
-      "confirmPassword" &&
+      "confirmPassword" in formData &&
       "email" in formData &&
       "displayName" in formData
     ) {
       const { password, confirmPassword, email, displayName } = formData;
 
+      setErro("");
+
       if (password !== confirmPassword) {
-        alert("Senhas não são iguais");
+        setErroSenha(
+          "As senhas não são iguais. Digite a mesma senha nos dois campos."
+        );
+        return;
       }
+
+      setErroSenha("");
 
       authMutate(
         { email, password },
@@ -62,7 +74,9 @@ const SignUpContainer: React.FC = () => {
             );
           },
           onError: () => {
-            alert("Erro ao cadastrar");
+            setErro(
+              "Não foi possível criar a conta. Confira o e-mail e use uma senha com pelo menos 6 caracteres."
+            );
           }
         }
       );
@@ -70,14 +84,15 @@ const SignUpContainer: React.FC = () => {
   });
 
   return (
-    <SignUpWrapper>
-      <SignUpTitle>Cadastro</SignUpTitle>
+    <Page>
+      <PageHeader back={{ to: "/login", label: "Entrar" }} title="Criar conta" />
       <SignUpForm onSubmit={onSubmit}>
         <FormInputComponent
           control={control}
           name="displayName"
-          label="Display Name"
+          label="Nome de exibição"
           type="text"
+          autoComplete="nickname"
           required
         />
 
@@ -86,47 +101,52 @@ const SignUpContainer: React.FC = () => {
           name="email"
           label="E-mail"
           type="email"
+          autoComplete="email"
           required
         />
 
         <FormInputComponent
           control={control}
           name="password"
-          label="Password"
+          label="Senha"
           type="password"
+          autoComplete="new-password"
           required
         />
 
         <FormInputComponent
           control={control}
           name="confirmPassword"
-          label="Confirmar Password"
+          label="Confirmar senha"
           type="password"
+          autoComplete="new-password"
           required
+          error={erroSenha}
         />
-        {isLoading && "Loading..."}
-        <SignUpButton type="submit">Cadastrar</SignUpButton>
+
+        {erro && <ErrorMessage role="alert">{erro}</ErrorMessage>}
+
+        <SignUpButton type="submit" disabled={isLoading}>
+          {isLoading ? "Criando conta…" : "Criar conta"}
+        </SignUpButton>
       </SignUpForm>
-    </SignUpWrapper>
+    </Page>
   );
 };
 
-const SignUpWrapper = styled(MainPageWrapper)`
-  grid-template-areas:
-    "title"
-    "form";
-  grid-template-rows: 60px 350px;
-`;
-
-const SignUpTitle = styled.h2`
-  font-size: ${props => props.theme.titleFontSize};
-  grid-area: title;
-`;
-
 const SignUpForm = styled.form`
-  grid-area: form;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 `;
 
-const SignUpButton = styled.button``;
+const ErrorMessage = styled.p`
+  color: var(--danger);
+`;
+
+const SignUpButton = styled(Button)`
+  align-self: center;
+  margin-top: var(--space-xs);
+`;
 
 export default SignUpContainer;

@@ -1,5 +1,10 @@
 import React from "react";
 import styled from "styled-components";
+import {
+  FieldLabel,
+  FieldTextArea,
+  FieldWrapper
+} from "../../../components/FormInput.component";
 import { PersonagemProps } from "../enigma-sol-oculto-personagem.component";
 
 const PersonagemNotasComponent: React.FC<PersonagemProps> = ({
@@ -8,37 +13,18 @@ const PersonagemNotasComponent: React.FC<PersonagemProps> = ({
 }) => {
   return (
     <PersonagemNotas>
-      <PersonagemNotasTitle>Notas:</PersonagemNotasTitle>
-      <PersonagemNotasValueWrapper>
-        <PersonagemNotasTextArea
-          value={personagem.notas}
-          onChange={e =>
-            setPersonagem({ ...personagem, notas: e.target.value })
-          }
-        />
-      </PersonagemNotasValueWrapper>
+      <FieldLabel htmlFor="campo-notas">Notas</FieldLabel>
+      <FieldTextArea
+        id="campo-notas"
+        value={personagem.notas}
+        onChange={e => setPersonagem({ ...personagem, notas: e.target.value })}
+      />
     </PersonagemNotas>
   );
 };
 
-const PersonagemNotas = styled.div`
+const PersonagemNotas = styled(FieldWrapper)`
   grid-area: notas;
-`;
-
-const PersonagemNotasTitle = styled.p`
-  font-size: 20px;
-`;
-
-const PersonagemNotasValueWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  font-size: 20px;
-  margin-top: 20px;
-`;
-
-const PersonagemNotasTextArea = styled.textarea`
-  padding: 10px;
 `;
 
 export default PersonagemNotasComponent;

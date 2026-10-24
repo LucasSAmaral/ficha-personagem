@@ -1,26 +1,32 @@
 import { useAuthSignInWithEmailAndPassword } from "@react-query-firebase/auth";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import Button, { ButtonLink } from "../../components/Button.component";
 import FormInputComponent, {
   ControlFormData
 } from "../../components/FormInput.component";
+import Page from "../../components/Page.component";
+import PageHeader from "../../components/PageHeader.component";
 import { auth } from "../../firebase/firebase.utils";
-import { ButtonCssStyle } from "../../theme/styles";
-import { MainPageWrapper } from "../main/Main.container";
 
 const LoginContainer: React.FC = () => {
   const { control, handleSubmit } = useForm<ControlFormData>({
     mode: "onSubmit"
   });
-  const { mutate: LoginUser } = useAuthSignInWithEmailAndPassword(auth);
+  const { mutate: LoginUser, isLoading } = useAuthSignInWithEmailAndPassword(
+    auth
+  );
+
+  const [erro, setErro] = useState("");
 
   const navigate = useNavigate();
 
   const onSubmit = handleSubmit(formData => {
     if ("email" in formData && "password" in formData) {
       const { email, password } = formData;
+      setErro("");
       LoginUser(
         { email, password },
         {
@@ -28,65 +34,59 @@ const LoginContainer: React.FC = () => {
             navigate("/");
           },
           onError: () => {
-            alert("Erro ao logar");
+            setErro("E-mail ou senha incorretos. Confira e tente de novo.");
           }
         }
       );
     }
   });
   return (
-    <LoginWrapper>
-      <LoginTitle>Login</LoginTitle>
+    <Page>
+      <PageHeader back={{ to: "/", label: "Início" }} title="Entrar" />
       <LoginForm onSubmit={onSubmit}>
         <FormInputComponent
           control={control}
           name="email"
           label="E-mail"
           type="email"
+          autoComplete="email"
           required
         />
         <FormInputComponent
           control={control}
           name="password"
-          label="Password"
+          label="Senha"
           type="password"
+          autoComplete="current-password"
           required
+          error={erro}
         />
 
-        <LoginButton type="submit">Entrar</LoginButton>
+        <LoginButton type="submit" disabled={isLoading}>
+          {isLoading ? "Entrando…" : "Entrar"}
+        </LoginButton>
       </LoginForm>
 
-      <SignUpLink to="/sign-up">Cadastre-se</SignUpLink>
-    </LoginWrapper>
+      <SignUpLink to="/sign-up" $quiet>
+        Criar conta
+      </SignUpLink>
+    </Page>
   );
 };
 
-const LoginWrapper = styled(MainPageWrapper)`
-  grid-template-areas:
-    "title"
-    "form"
-    "signUpButton";
-  grid-template-rows: 60px 350px;
-`;
-
-const LoginTitle = styled.h2`
-  font-size: ${props => props.theme.titleFontSize};
-  grid-area: title;
-`;
-
 const LoginForm = styled.form`
-  grid-area: form;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 `;
 
-const LoginButton = styled.button`
-  ${ButtonCssStyle}
-  border: none;
-  cursor: pointer;
+const LoginButton = styled(Button)`
+  align-self: center;
+  margin-top: var(--space-xs);
 `;
 
-const SignUpLink = styled(Link)`
-  grid-area: signUpButton;
-  ${ButtonCssStyle}
+const SignUpLink = styled(ButtonLink)`
+  align-self: center;
 `;
 
 export default LoginContainer;

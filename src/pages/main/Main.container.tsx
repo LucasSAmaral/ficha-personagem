@@ -1,109 +1,91 @@
 import { useAuthSignOut, useAuthUser } from "@react-query-firebase/auth";
 import React from "react";
-import { Link } from "react-router-dom";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
+import BookTile from "../../components/BookTile.component";
+import Button, { ButtonLink } from "../../components/Button.component";
+import Loading from "../../components/Loading.component";
+import Page from "../../components/Page.component";
+import PageHeader from "../../components/PageHeader.component";
 import { auth } from "../../firebase/firebase.utils";
-import { ButtonCssStyle } from "../../theme/styles";
-
-type GridArea = "login" | "enigma-sol-oculto" | "uivo-do-lobisomem" | "sobre-a-aplicacao";
+import { media } from "../../theme/tokens";
 
 const MainPageContainer: React.FC = () => {
   const mutation = useAuthSignOut(auth);
   const { isLoading } = useAuthUser(["user"], auth);
 
   if (isLoading) {
-    return (
-      <MainPageWrapper>
-        <MainPageTitle>Ficha Personagem</MainPageTitle>
-        Loading...
-      </MainPageWrapper>
-    );
+    return <Loading fullPage>Carregando</Loading>;
   }
 
   if (!auth.currentUser) {
     return (
-      <MainPageWrapper isUserLoggedIn={Boolean(auth.currentUser)}>
-        <MainPageTitle>Ficha Personagem</MainPageTitle>
-        <MainPageLink to="/login" gridArea="login">
-          Login
-        </MainPageLink>
-      </MainPageWrapper>
+      <Page>
+        <PageHeader title="Ficha Personagem" />
+        <MainPageIntro>
+          Guarde o progresso dos seus livros-jogo sem papel e sem borracha:
+          atributos, itens, notas e o último parágrafo lido.
+        </MainPageIntro>
+        <MainPageActions>
+          <ButtonLink to="/login">Entrar</ButtonLink>
+          <ButtonLink to="/sign-up" $quiet>
+            Criar conta
+          </ButtonLink>
+        </MainPageActions>
+      </Page>
     );
   }
+
   return (
-    <MainPageWrapper isUserLoggedIn={Boolean(auth.currentUser)}>
-      <MainPageTitle>Ficha Personagem</MainPageTitle>
-      <MainPageLink
-        to="/enigma-sol-oculto/personagem"
-        gridArea="enigma-sol-oculto"
-      >
-        O Enigma do Sol Oculto
-      </MainPageLink>
-      <MainPageLink
-        to="/uivo-do-lobisomem/personagem"
-        gridArea="uivo-do-lobisomem"
-      >
-        Uivo do Lobisomem
-      </MainPageLink>
-      <MainPageLink
-        to="/sobre-a-aplicacao"
-        gridArea="sobre-a-aplicacao"
-      >
-        Sobre a aplicação
-      </MainPageLink>
-      <LogoutButton onClick={() => mutation.mutate()}>deslogar</LogoutButton>
-    </MainPageWrapper>
+    <Page>
+      <PageHeader title="Ficha Personagem" eyebrow="Sua estante" />
+      <MainPageBooks>
+        <BookTile
+          to="/enigma-sol-oculto/personagem"
+          theme="sol-oculto"
+          kind="Investigação lovecraftiana"
+          title="O Enigma do Sol Oculto"
+          meta="Abrir investigadores"
+        />
+        <BookTile
+          to="/uivo-do-lobisomem/personagem"
+          theme="lobisomem"
+          kind="Fantasia sombria"
+          title="Uivo do Lobisomem"
+          meta="Em breve"
+          soon
+        />
+      </MainPageBooks>
+      <MainPageActions>
+        <ButtonLink to="/sobre-a-aplicacao" $quiet>
+          Sobre a aplicação
+        </ButtonLink>
+        <Button type="button" $quiet onClick={() => mutation.mutate()}>
+          Sair
+        </Button>
+      </MainPageActions>
+    </Page>
   );
 };
 
-export const MainPageWrapper = styled.div<{ isUserLoggedIn?: boolean }>`
-  max-width: 600px;
-  width: 100%;
-  margin: 0 auto;
-  height: 100vh;
-  padding-top: 50px;
+const MainPageIntro = styled.p`
+  max-width: 46ch;
+`;
 
+const MainPageBooks = styled.div`
   display: grid;
-  ${({ isUserLoggedIn }) =>
-    isUserLoggedIn
-      ? css`
-          grid-template-areas:
-            "title"
-            "enigma-sol-oculto"
-            "uivo-do-lobisomem"
-            "sobre-a-aplicacao";
-        `
-      : css`
-          grid-template-areas:
-            "title"
-            "login";
-        `}
-  align-items: center;
-  text-align: center;
-  grid-template-rows: repeat(3, 57px);
-  grid-gap: 30px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
 
-  @media (max-width: 425px) {
-    grid-template-rows: 125px;
+  ${media.mobile} {
+    grid-template-columns: minmax(0, 1fr);
   }
 `;
 
-const MainPageTitle = styled.h2`
-  font-size: ${props => props.theme.titleFontSize};
-  grid-area: title;
-`;
-
-const MainPageLink = styled(Link)<{
-  gridArea: GridArea;
-}>`
-  grid-area: ${({ gridArea }) => gridArea};
-  ${ButtonCssStyle}
-`;
-
-const LogoutButton = styled.button`
-  ${ButtonCssStyle}
-  border: none;
-  cursor: pointer;
+const MainPageActions = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
 `;
 
 export default MainPageContainer;
