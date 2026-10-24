@@ -7,7 +7,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import Button from "../../components/Button.component";
+import AutoSaveStatus from "../../components/AutoSaveStatus.component";
 import {
   FieldInput,
   FieldLabel,
@@ -21,6 +21,7 @@ import PageHeader from "../../components/PageHeader.component";
 import StatCounter from "../../components/StatCounter.component";
 import StatusToggle from "../../components/StatusToggle.component";
 import { auth, firestore } from "../../firebase/firebase.utils";
+import useAutoSave from "../../hooks/useAutoSave";
 import { media } from "../../theme/tokens";
 import EncontrosMonstros from "./components/encontros-monstros.component";
 
@@ -69,8 +70,6 @@ const initialState: LobisomemStateProps = {
   morto: false
 };
 
-type SaveStatus = "idle" | "saved" | "error";
-
 const LIMITE_CRITICO = 3;
 
 const UivoDoLobisomemPersonagem: React.FC = () => {
@@ -92,46 +91,37 @@ const UivoDoLobisomemPersonagem: React.FC = () => {
     { subscribe: true }
   );
 
-  const {
-    mutate: savePersonagem,
-    isLoading: isLoadingSavePersonagem
-  } = useFirestoreDocumentMutation(ref);
+  const { mutateAsync: savePersonagem } = useFirestoreDocumentMutation(ref);
 
   const [personagem, setPersonagem] = useState<LobisomemStateProps>(
     initialState
   );
 
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const { status, online, queue, isDirty } = useAutoSave<LobisomemStateProps>(
+    value => savePersonagem({ ...value, userId })
+  );
 
-  const update = (changes: Partial<LobisomemStateProps>) =>
-    setPersonagem({ ...personagem, ...changes });
+  const update = (changes: Partial<LobisomemStateProps>) => {
+    const atualizado = { ...personagem, ...changes };
+    setPersonagem(atualizado);
+    queue(atualizado);
+  };
 
   useEffect(() => {
-    if (personagemData) {
+    // Enquanto houver mudança do jogador ainda não confirmada, o que chega do
+    // servidor não sobrescreve a tela
+    if (personagemData && !isDirty()) {
       // Fichas antigas podem não ter todos os campos
       setPersonagem({
         ...initialState,
         ...(personagemData as Partial<LobisomemStateProps>)
       });
     }
-  }, [personagemData]);
-
-  useEffect(() => {
-    setSaveStatus("idle");
-  }, [personagem]);
+  }, [personagemData, isDirty]);
 
   if (isLoadingPersonagem) {
     return <Loading fullPage>Acendendo a lanterna</Loading>;
   }
-
-  const onSave = () =>
-    savePersonagem(
-      { ...personagem, userId },
-      {
-        onSuccess: () => setSaveStatus("saved"),
-        onError: () => setSaveStatus("error")
-      }
-    );
 
   return (
     <Page $wide>
@@ -246,20 +236,7 @@ const UivoDoLobisomemPersonagem: React.FC = () => {
           onChange={morto => update({ morto })}
         />
 
-        <SalvarPersonagem>
-          <Button
-            type="button"
-            disabled={isLoadingSavePersonagem}
-            onClick={onSave}
-          >
-            {isLoadingSavePersonagem ? "Salvando…" : "Salvar ficha"}
-          </Button>
-          <SaveMessage role="status" $error={saveStatus === "error"}>
-            {saveStatus === "saved" && "Ficha salva."}
-            {saveStatus === "error" &&
-              "Não foi possível salvar a ficha. Verifique a conexão e tente de novo."}
-          </SaveMessage>
-        </SalvarPersonagem>
+        <AutoSaveStatus status={status} online={online} />
       </PersonagemWrapper>
     </Page>
   );
@@ -294,24 +271,6 @@ const PersonagemWrapper = styled.div`
       "salvar";
     gap: var(--space-md);
   }
-`;
-
-const SalvarPersonagem = styled.div`
-  grid-area: salvar;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-xs);
-  padding-top: var(--space-md);
-  border-top: 3px double var(--line);
-`;
-
-const SaveMessage = styled.p<{ $error: boolean }>`
-  min-height: 20px;
-  font-size: 15px;
-  line-height: 20px;
-  text-align: center;
-  color: ${({ $error }) => ($error ? "var(--danger)" : "var(--ink-muted)")};
 `;
 
 export default UivoDoLobisomemPersonagem;

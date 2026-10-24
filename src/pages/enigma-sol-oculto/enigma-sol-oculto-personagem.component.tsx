@@ -7,7 +7,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import Button from "../../components/Button.component";
+import AutoSaveStatus from "../../components/AutoSaveStatus.component";
 import {
   FieldInput,
   FieldLabel,
@@ -21,6 +21,7 @@ import PageHeader from "../../components/PageHeader.component";
 import StatCounter from "../../components/StatCounter.component";
 import StatusToggle from "../../components/StatusToggle.component";
 import { auth, firestore } from "../../firebase/firebase.utils";
+import useAutoSave from "../../hooks/useAutoSave";
 import { media } from "../../theme/tokens";
 
 export type PersonagemStateProps = {
@@ -47,8 +48,6 @@ const initialState: PersonagemStateProps = {
   ultimoParagrafo: ""
 };
 
-type SaveStatus = "idle" | "saved" | "error";
-
 const LIMITE_CRITICO = 3;
 
 const EnigmaSolOcultoPersonagem: React.FC = () => {
@@ -70,57 +69,42 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
     { subscribe: true }
   );
 
-  const {
-    mutate: savePersonagem,
-    isLoading: isLoadingSavePersonagem
-  } = useFirestoreDocumentMutation(ref);
+  const { mutateAsync: savePersonagem } = useFirestoreDocumentMutation(ref);
 
   const [personagem, setPersonagem] = useState<PersonagemStateProps>(
     initialState
   );
 
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const { status, online, queue, isDirty } = useAutoSave<PersonagemStateProps>(
+    value => savePersonagem({ ...value, userId })
+  );
 
-  const { Nome, ...restPersonagem } = personagem;
-
-  const update = (changes: Partial<PersonagemStateProps>) =>
-    setPersonagem({ ...personagem, ...changes });
+  const update = (changes: Partial<PersonagemStateProps>) => {
+    const atualizado = { ...personagem, ...changes };
+    setPersonagem(atualizado);
+    queue(atualizado);
+  };
 
   useEffect(() => {
-    if (personagemData) {
+    // Enquanto houver mudança do jogador ainda não confirmada, o que chega do
+    // servidor não sobrescreve a tela
+    if (personagemData && !isDirty()) {
       setPersonagem({
         ...(personagemData as PersonagemStateProps)
       });
     }
-  }, [personagemData]);
-
-  useEffect(() => {
-    setSaveStatus("idle");
-  }, [personagem]);
+  }, [personagemData, isDirty]);
 
   if (isLoadingPersonagem) {
     return <Loading fullPage>Abrindo o dossiê</Loading>;
   }
-
-  const onSave = () =>
-    savePersonagem(
-      {
-        Nome,
-        ...restPersonagem,
-        userId
-      },
-      {
-        onSuccess: () => setSaveStatus("saved"),
-        onError: () => setSaveStatus("error")
-      }
-    );
 
   return (
     <Page $wide>
       <PageHeader
         back={{ to: "/enigma-sol-oculto/personagem", label: "Investigadores" }}
         eyebrow="O Enigma do Sol Oculto"
-        title={Nome}
+        title={personagem.Nome}
       />
 
       <PersonagemWrapper>
@@ -199,20 +183,7 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
           onChange={morto => update({ morto })}
         />
 
-        <SalvarPersonagem>
-          <Button
-            type="button"
-            disabled={isLoadingSavePersonagem}
-            onClick={onSave}
-          >
-            {isLoadingSavePersonagem ? "Salvando…" : "Salvar ficha"}
-          </Button>
-          <SaveMessage role="status" $error={saveStatus === "error"}>
-            {saveStatus === "saved" && "Ficha salva."}
-            {saveStatus === "error" &&
-              "Não foi possível salvar a ficha. Verifique a conexão e tente de novo."}
-          </SaveMessage>
-        </SalvarPersonagem>
+        <AutoSaveStatus status={status} online={online} />
       </PersonagemWrapper>
     </Page>
   );
@@ -243,24 +214,6 @@ const PersonagemWrapper = styled.div`
       "salvar";
     gap: var(--space-md);
   }
-`;
-
-const SalvarPersonagem = styled.div`
-  grid-area: salvar;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-xs);
-  padding-top: var(--space-md);
-  border-top: 1px solid var(--hairline);
-`;
-
-const SaveMessage = styled.p<{ $error: boolean }>`
-  min-height: 20px;
-  font-size: 15px;
-  line-height: 20px;
-  text-align: center;
-  color: ${({ $error }) => ($error ? "var(--danger)" : "var(--ink-muted)")};
 `;
 
 export default EnigmaSolOcultoPersonagem;

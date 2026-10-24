@@ -23,7 +23,7 @@ npm run release  # standard-version (bump + CHANGELOG + tag) e push para origin 
 >
 > O Babel do `react-scripts` 2 não entende optional chaining (`?.`) nem nullish coalescing (`??`): não use.
 >
-> O único teste (`src/App.test.tsx`) é o template do CRA e procura o texto "learn react", que não existe na aplicação — ele falha. Não há suíte de testes real.
+> Testes: `CI=true NODE_OPTIONS=--openssl-legacy-provider npx react-scripts test --watchAll=false src/hooks` roda os testes do `useAutoSave`. O `@testing-library/react` instalado (v13) exige React 18, então os testes usam `react-dom/test-utils` direto. `src/App.test.tsx` é o template do CRA e procura "learn react", que não existe na aplicação — ele falha.
 
 ## Stack
 
@@ -87,7 +87,7 @@ Cada livro-jogo ganha sua própria pasta em `src/pages/<slug-do-livro>/` (lista,
 - Uniões de string literais para restringir valores (`type NumberProp = "saude" | "sanidade" | "dinheiro"`), usadas também para indexar o objeto do personagem (`personagem[prop]`).
 - Mapas simples como objetos (`const PropMap = { tracos: "traço", equipamento: "item" }`, `StatColorMap`).
 - **Um `export default` por arquivo** (o componente), sempre na última linha. Exports nomeados apenas para tipos e styled components reutilizados (ex.: `FieldInput`, `FieldLabel`, `ButtonLink`).
-- Estado da ficha: a página mantém `personagem` com `useState` e um helper `update(changes)` que faz `setPersonagem({ ...personagem, ...changes })`. Os componentes compartilhados são controlados: recebem `value`/`items`/`morto` e `onChange`, e aceitam `area` para o `grid-area`.
+- Estado da ficha: a página mantém `personagem` com `useState` e um helper `update(changes)` que aplica a mudança e chama `queue()` do `useAutoSave` (`src/hooks/useAutoSave.ts`). Não há botão de salvar: o hook grava 1s depois da última mudança, na hora ao esconder a página ou sair da ficha, e tenta de novo em caso de erro; `AutoSaveStatus` mostra o estado. O que chega do Firestore só é aplicado na tela quando `isDirty()` é falso. O Firestore usa cache offline (`enableIndexedDbPersistence` em `firebase.utils.ts`). Os componentes compartilhados são controlados: recebem `value`/`items`/`morto` e `onChange`, e aceitam `area` para o `grid-area`.
 - Navegação programática com `useNavigate()`; o "voltar" das páginas é o link do `PageHeader` (`back={{ to, label }}`).
 - **Não use `alert`.** Erros aparecem na tela em `var(--danger)`: no campo (prop `error` do `FormInputComponent`) ou num `<p role="alert">`, dizendo o que houve e o que fazer.
 - Carregamento: `<Loading fullPage>Texto em português</Loading>`. Durante uma mutation, desabilite o botão e troque o rótulo ("Salvando…").
