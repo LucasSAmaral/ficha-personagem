@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { enableIndexedDbPersistence, getFirestore } from "firebase/firestore";
 
 const config = {
   apiKey: "AIzaSyCMmGQ_kT5YYp-kQHs8gPH4OLv7ZXMTh8Y",
@@ -9,7 +9,7 @@ const config = {
   storageBucket: "ficha-personagem-db.appspot.com",
   messagingSenderId: "355909031086",
   appId: "1:355909031086:web:c61ea2cee30b2a1edb493f",
-  measurementId: "G-C931BVSGL8",
+  measurementId: "G-C931BVSGL8"
 };
 
 const firebase = initializeApp(config);
@@ -17,3 +17,7 @@ const firebase = initializeApp(config);
 export const auth = getAuth(firebase);
 
 export const firestore = getFirestore(firebase);
+
+// Cache offline: as gravações ficam no aparelho e são enviadas quando a
+// conexão voltar. Falha com mais de uma aba aberta; nesse caso segue online.
+enableIndexedDbPersistence(firestore).catch(() => undefined);

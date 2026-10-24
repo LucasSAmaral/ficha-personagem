@@ -5,17 +5,24 @@ import {
 import { doc } from "firebase/firestore";
 import React from "react";
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
+import AutoSaveStatus from "../../components/AutoSaveStatus.component";
+import {
+  FieldInput,
+  FieldLabel,
+  FieldTextArea,
+  FieldWrapper
+} from "../../components/FormInput.component";
+import ListField from "../../components/ListField.component";
+import Loading from "../../components/Loading.component";
+import Page from "../../components/Page.component";
+import PageHeader from "../../components/PageHeader.component";
+import StatCounter from "../../components/StatCounter.component";
+import StatusToggle from "../../components/StatusToggle.component";
 import { auth, firestore } from "../../firebase/firebase.utils";
-import { ButtonCssStyle } from "../../theme/styles";
-import { MainPageWrapper } from "../main/Main.container";
-import Loading from "./components/loading-component";
-import PersonagemArrayProp from "./components/personagem-array-prop.component";
-import Notas from "./components/personagem-notas.component";
-import PersonagemNumberProp from "./components/personagem-number-prop.component";
-import Status from "./components/personagem-status.component";
-import UltimoParagrafo from "./components/personagem-ultimo-paragrafo.component";
+import useAutoSave from "../../hooks/useAutoSave";
+import { media } from "../../theme/tokens";
 
 export type PersonagemStateProps = {
   Nome: string;
@@ -27,11 +34,6 @@ export type PersonagemStateProps = {
   saude: number;
   tracos: Array<string>;
   ultimoParagrafo: string;
-};
-
-export type PersonagemProps = {
-  personagem: PersonagemStateProps;
-  setPersonagem: React.Dispatch<React.SetStateAction<PersonagemStateProps>>;
 };
 
 const initialState: PersonagemStateProps = {
@@ -46,9 +48,10 @@ const initialState: PersonagemStateProps = {
   ultimoParagrafo: ""
 };
 
+const LIMITE_CRITICO = 3;
+
 const EnigmaSolOcultoPersonagem: React.FC = () => {
   const { nomePersonagem } = useParams<{ nomePersonagem: string }>();
-  const navigate = useNavigate();
 
   const safeNomePersonagem = nomePersonagem ? nomePersonagem : "";
   const userId = auth.currentUser ? auth.currentUser.uid : "";
@@ -66,145 +69,150 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
     { subscribe: true }
   );
 
-  const {
-    mutate: savePersonagem,
-    isLoading: isLoadingSavePersonagem
-  } = useFirestoreDocumentMutation(ref);
+  const { mutateAsync: savePersonagem } = useFirestoreDocumentMutation(ref);
 
   const [personagem, setPersonagem] = useState<PersonagemStateProps>(
     initialState
   );
 
-  const { Nome, ...restPersonagem } = personagem;
+  const { status, online, queue, isDirty } = useAutoSave<PersonagemStateProps>(
+    value => savePersonagem({ ...value, userId })
+  );
+
+  const update = (changes: Partial<PersonagemStateProps>) => {
+    const atualizado = { ...personagem, ...changes };
+    setPersonagem(atualizado);
+    queue(atualizado);
+  };
 
   useEffect(() => {
-    if (personagemData) {
+    // Enquanto houver mudança do jogador ainda não confirmada, o que chega do
+    // servidor não sobrescreve a tela
+    if (personagemData && !isDirty()) {
       setPersonagem({
         ...(personagemData as PersonagemStateProps)
       });
     }
-  }, [personagemData]);
+  }, [personagemData, isDirty]);
 
-  if (isLoadingPersonagem || isLoadingSavePersonagem) {
-    return <Loading>Loading...</Loading>;
+  if (isLoadingPersonagem) {
+    return <Loading fullPage>Abrindo o dossiê</Loading>;
   }
 
   return (
-    <PersonagemWrapper>
-      <PersonagemNome>{Nome}</PersonagemNome>
-
-      <PersonagemNumberProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Saúde Atual:"
-        prop="saude"
+    <Page $wide>
+      <PageHeader
+        back={{ to: "/enigma-sol-oculto/personagem", label: "Investigadores" }}
+        eyebrow="O Enigma do Sol Oculto"
+        title={personagem.Nome}
       />
 
-      <PersonagemNumberProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Sanidade Atual:"
-        prop="sanidade"
-      />
+      <PersonagemWrapper>
+        <StatCounter
+          id="saude"
+          label="Saúde"
+          kind="vital"
+          area="saude"
+          value={personagem.saude}
+          critical={personagem.saude <= LIMITE_CRITICO}
+          onChange={saude => update({ saude })}
+        />
 
-      <PersonagemArrayProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Traços:"
-        prop="tracos"
-      />
+        <StatCounter
+          id="sanidade"
+          label="Sanidade"
+          kind="mind"
+          area="sanidade"
+          value={personagem.sanidade}
+          critical={personagem.sanidade <= LIMITE_CRITICO}
+          onChange={sanidade => update({ sanidade })}
+        />
 
-      <PersonagemArrayProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Equipamentos:"
-        prop="equipamento"
-      />
+        <StatCounter
+          id="dinheiro"
+          label="Libras"
+          kind="coin"
+          area="dinheiro"
+          value={personagem.dinheiro}
+          onChange={dinheiro => update({ dinheiro })}
+        />
 
-      <PersonagemNumberProp
-        personagem={personagem}
-        setPersonagem={setPersonagem}
-        title="Libras:"
-        prop="dinheiro"
-      />
+        <ListField
+          id="tracos"
+          title="Traços"
+          itemLabel="traço"
+          area="tracos"
+          items={personagem.tracos}
+          onChange={tracos => update({ tracos })}
+        />
 
-      <Notas personagem={personagem} setPersonagem={setPersonagem} />
+        <ListField
+          id="equipamento"
+          title="Equipamento"
+          itemLabel="item"
+          area="equipamento"
+          items={personagem.equipamento}
+          onChange={equipamento => update({ equipamento })}
+        />
 
-      <Status personagem={personagem} setPersonagem={setPersonagem} />
+        <FieldWrapper $area="notas">
+          <FieldLabel htmlFor="campo-notas">Notas</FieldLabel>
+          <FieldTextArea
+            id="campo-notas"
+            value={personagem.notas}
+            onChange={e => update({ notas: e.target.value })}
+          />
+        </FieldWrapper>
 
-      <UltimoParagrafo personagem={personagem} setPersonagem={setPersonagem} />
+        <FieldWrapper $area="ultParagrafo">
+          <FieldLabel htmlFor="campo-ultimo-paragrafo">
+            Último parágrafo
+          </FieldLabel>
+          <FieldInput
+            id="campo-ultimo-paragrafo"
+            type="text"
+            inputMode="numeric"
+            value={personagem.ultimoParagrafo}
+            onChange={e => update({ ultimoParagrafo: e.target.value })}
+          />
+        </FieldWrapper>
 
-      <Voltar onClick={() => navigate(-1)}>Voltar</Voltar>
+        <StatusToggle
+          area="status"
+          morto={personagem.morto}
+          onChange={morto => update({ morto })}
+        />
 
-      <SalvarPersonagem
-        onClick={() =>
-          savePersonagem({
-            Nome,
-            ...restPersonagem,
-            userId
-          })
-        }
-      >
-        Salvar Personagem
-      </SalvarPersonagem>
-    </PersonagemWrapper>
+        <AutoSaveStatus status={status} online={online} />
+      </PersonagemWrapper>
+    </Page>
   );
 };
 
-const PersonagemWrapper = styled(MainPageWrapper)`
+const PersonagemWrapper = styled.div`
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   grid-template-areas:
-    "nome nome nome nome"
-    "saude saude sanidade sanidade"
-    "tracos tracos equipamento equipamento"
-    "notas notas ultParagrafo ultParagrafo"
-    "dinheiro dinheiro status status"
-    "voltar voltar salvar salvar";
-  column-gap: 30px;
-  padding-top: 0;
-  grid-template-rows: auto;
+    "saude saude sanidade sanidade dinheiro dinheiro"
+    "tracos tracos tracos equipamento equipamento equipamento"
+    "notas notas notas notas notas notas"
+    "ultParagrafo ultParagrafo ultParagrafo status status status"
+    "salvar salvar salvar salvar salvar salvar";
+  gap: var(--space-lg);
 
-  @media (max-width: 425px) {
+  ${media.mobile} {
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      "nome"
       "saude"
       "sanidade"
+      "dinheiro"
       "tracos"
       "equipamento"
       "notas"
       "ultParagrafo"
-      "dinheiro"
       "status"
-      "salvar"
-      "voltar";
-    justify-content: center;
-    margin-bottom: 50px;
-  }
-`;
-
-const PersonagemNome = styled.h2`
-  font-size: ${props => props.theme.titleFontSize};
-  grid-area: nome;
-`;
-
-const SalvarPersonagem = styled.button`
-  grid-area: salvar;
-  cursor: pointer;
-  border: none;
-  ${ButtonCssStyle}
-
-  @media (max-width: 425px) {
-    margin-top: 20px;
-  }
-`;
-
-const Voltar = styled.button`
-  grid-area: voltar;
-  cursor: pointer;
-  border: none;
-  ${ButtonCssStyle}
-
-  @media (max-width: 425px) {
-    margin-top: 20px;
+      "salvar";
+    gap: var(--space-md);
   }
 `;
 
