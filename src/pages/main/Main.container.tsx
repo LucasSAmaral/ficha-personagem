@@ -51,8 +51,7 @@ const MainPageContainer: React.FC = () => {
           theme="lobisomem"
           kind="Fantasia sombria"
           title="Uivo do Lobisomem"
-          meta="Em breve"
-          soon
+          meta="Abrir aventureiros"
         />
       </MainPageBooks>
       <MainPageActions>

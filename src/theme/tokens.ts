@@ -47,6 +47,9 @@ export const tokens = css`
     --fp-button-font: var(--font-ficha-display);
     --fp-button-weight: 800;
     --fp-button-track: 0.08em;
+    --fp-button-case: uppercase;
+    --fp-button-size: 15px;
+    --fp-button-inset: none;
     --fp-radius: var(--radius-md);
     --fp-stamp-rotate: 0deg;
   }
@@ -87,6 +90,9 @@ export const tokens = css`
     --fp-button-font: var(--font-sol-type);
     --fp-button-weight: 400;
     --fp-button-track: 0.12em;
+    --fp-button-case: uppercase;
+    --fp-button-size: 15px;
+    --fp-button-inset: none;
     --fp-radius: var(--radius-sm);
     --fp-stamp-rotate: -7deg;
   }
@@ -128,6 +134,11 @@ export const tokens = css`
     --fp-button-font: var(--font-lobo-label);
     --fp-button-weight: 700;
     --fp-button-track: 0.1em;
+    --fp-button-case: none;
+    --fp-button-size: 16px;
+    /* filete gravado por dentro, como uma placa de ferro */
+    --fp-button-inset: inset 0 0 0 3px var(--accent),
+      inset 0 0 0 4px var(--on-accent);
     --fp-radius: var(--radius-none);
     --fp-stamp-rotate: 0deg;
   }
@@ -162,8 +173,7 @@ export const tokens = css`
     --font-sol-display: "IM Fell English", "Iowan Old Style", Georgia, serif;
     --font-sol-body: "Crimson Pro", Georgia, serif;
     --font-sol-type: "Special Elite", "Courier New", Courier, monospace;
-    --font-lobo-display: "Grenze Gotisch", "Old English Text MT", Georgia,
-      serif;
+    --font-lobo-display: "Grenze Gotisch", "Old English Text MT", Georgia, serif;
     --font-lobo-body: "Alegreya", Georgia, serif;
     --font-lobo-label: "Alegreya SC", "Alegreya", Georgia, serif;
   }

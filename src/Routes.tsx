@@ -7,6 +7,9 @@ import LoginContainer from "./pages/login/Login.container";
 import MainPageContainer from "./pages/main/Main.container";
 import SignUpContainer from "./pages/sign-up/SignUp.container";
 import ThemeScope from "./components/ThemeScope.component";
+import CriarAventureiroContainer from "./pages/uivo-do-lobisomem/criar-personagem/criar-personagem.container";
+import UivoDoLobisomemPersonagem from "./pages/uivo-do-lobisomem/uivo-do-lobisomem-personagem.component";
+import UivoDoLobisomemContainer from "./pages/uivo-do-lobisomem/uivo-do-lobisomem.container";
 
 function AppRoutes() {
   return (
@@ -35,9 +38,23 @@ function AppRoutes() {
             />
           </Route>
           <Route
-            path="uivo-do-lobisomem/personagem"
-            element={<>Quase lá...</>}
-          />
+            path="uivo-do-lobisomem"
+            element={
+              <ThemeScope theme="lobisomem">
+                <Outlet />
+              </ThemeScope>
+            }
+          >
+            <Route path="personagem" element={<UivoDoLobisomemContainer />} />
+            <Route
+              path="personagem/criar"
+              element={<CriarAventureiroContainer />}
+            />
+            <Route
+              path="personagem/:nomePersonagem"
+              element={<UivoDoLobisomemPersonagem />}
+            />
+          </Route>
           <Route path="sobre-a-aplicacao" element={<>Sobre a Aplicação</>} />
         </Route>
       </Routes>

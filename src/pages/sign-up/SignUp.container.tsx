@@ -85,7 +85,10 @@ const SignUpContainer: React.FC = () => {
 
   return (
     <Page>
-      <PageHeader back={{ to: "/login", label: "Entrar" }} title="Criar conta" />
+      <PageHeader
+        back={{ to: "/login", label: "Entrar" }}
+        title="Criar conta"
+      />
       <SignUpForm onSubmit={onSubmit}>
         <FormInputComponent
           control={control}

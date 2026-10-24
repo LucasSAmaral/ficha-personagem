@@ -8,16 +8,20 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import Button from "../../components/Button.component";
+import {
+  FieldInput,
+  FieldLabel,
+  FieldTextArea,
+  FieldWrapper
+} from "../../components/FormInput.component";
+import ListField from "../../components/ListField.component";
 import Loading from "../../components/Loading.component";
 import Page from "../../components/Page.component";
 import PageHeader from "../../components/PageHeader.component";
+import StatCounter from "../../components/StatCounter.component";
+import StatusToggle from "../../components/StatusToggle.component";
 import { auth, firestore } from "../../firebase/firebase.utils";
 import { media } from "../../theme/tokens";
-import PersonagemArrayProp from "./components/personagem-array-prop.component";
-import Notas from "./components/personagem-notas.component";
-import PersonagemNumberProp from "./components/personagem-number-prop.component";
-import Status from "./components/personagem-status.component";
-import UltimoParagrafo from "./components/personagem-ultimo-paragrafo.component";
 
 export type PersonagemStateProps = {
   Nome: string;
@@ -29,11 +33,6 @@ export type PersonagemStateProps = {
   saude: number;
   tracos: Array<string>;
   ultimoParagrafo: string;
-};
-
-export type PersonagemProps = {
-  personagem: PersonagemStateProps;
-  setPersonagem: React.Dispatch<React.SetStateAction<PersonagemStateProps>>;
 };
 
 const initialState: PersonagemStateProps = {
@@ -49,6 +48,8 @@ const initialState: PersonagemStateProps = {
 };
 
 type SaveStatus = "idle" | "saved" | "error";
+
+const LIMITE_CRITICO = 3;
 
 const EnigmaSolOcultoPersonagem: React.FC = () => {
   const { nomePersonagem } = useParams<{ nomePersonagem: string }>();
@@ -81,6 +82,9 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
 
   const { Nome, ...restPersonagem } = personagem;
+
+  const update = (changes: Partial<PersonagemStateProps>) =>
+    setPersonagem({ ...personagem, ...changes });
 
   useEffect(() => {
     if (personagemData) {
@@ -120,46 +124,80 @@ const EnigmaSolOcultoPersonagem: React.FC = () => {
       />
 
       <PersonagemWrapper>
-        <PersonagemNumberProp
-          personagem={personagem}
-          setPersonagem={setPersonagem}
-          title="Saúde"
-          prop="saude"
+        <StatCounter
+          id="saude"
+          label="Saúde"
+          kind="vital"
+          area="saude"
+          value={personagem.saude}
+          critical={personagem.saude <= LIMITE_CRITICO}
+          onChange={saude => update({ saude })}
         />
 
-        <PersonagemNumberProp
-          personagem={personagem}
-          setPersonagem={setPersonagem}
-          title="Sanidade"
-          prop="sanidade"
+        <StatCounter
+          id="sanidade"
+          label="Sanidade"
+          kind="mind"
+          area="sanidade"
+          value={personagem.sanidade}
+          critical={personagem.sanidade <= LIMITE_CRITICO}
+          onChange={sanidade => update({ sanidade })}
         />
 
-        <PersonagemNumberProp
-          personagem={personagem}
-          setPersonagem={setPersonagem}
-          title="Libras"
-          prop="dinheiro"
+        <StatCounter
+          id="dinheiro"
+          label="Libras"
+          kind="coin"
+          area="dinheiro"
+          value={personagem.dinheiro}
+          onChange={dinheiro => update({ dinheiro })}
         />
 
-        <PersonagemArrayProp
-          personagem={personagem}
-          setPersonagem={setPersonagem}
+        <ListField
+          id="tracos"
           title="Traços"
-          prop="tracos"
+          itemLabel="traço"
+          area="tracos"
+          items={personagem.tracos}
+          onChange={tracos => update({ tracos })}
         />
 
-        <PersonagemArrayProp
-          personagem={personagem}
-          setPersonagem={setPersonagem}
+        <ListField
+          id="equipamento"
           title="Equipamento"
-          prop="equipamento"
+          itemLabel="item"
+          area="equipamento"
+          items={personagem.equipamento}
+          onChange={equipamento => update({ equipamento })}
         />
 
-        <Notas personagem={personagem} setPersonagem={setPersonagem} />
+        <FieldWrapper $area="notas">
+          <FieldLabel htmlFor="campo-notas">Notas</FieldLabel>
+          <FieldTextArea
+            id="campo-notas"
+            value={personagem.notas}
+            onChange={e => update({ notas: e.target.value })}
+          />
+        </FieldWrapper>
 
-        <UltimoParagrafo personagem={personagem} setPersonagem={setPersonagem} />
+        <FieldWrapper $area="ultParagrafo">
+          <FieldLabel htmlFor="campo-ultimo-paragrafo">
+            Último parágrafo
+          </FieldLabel>
+          <FieldInput
+            id="campo-ultimo-paragrafo"
+            type="text"
+            inputMode="numeric"
+            value={personagem.ultimoParagrafo}
+            onChange={e => update({ ultimoParagrafo: e.target.value })}
+          />
+        </FieldWrapper>
 
-        <Status personagem={personagem} setPersonagem={setPersonagem} />
+        <StatusToggle
+          area="status"
+          morto={personagem.morto}
+          onChange={morto => update({ morto })}
+        />
 
         <SalvarPersonagem>
           <Button

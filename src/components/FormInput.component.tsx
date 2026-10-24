@@ -12,7 +12,12 @@ type FormInputFields =
   | "Nome"
   | "saude"
   | "sanidade"
-  | "dinheiro";
+  | "dinheiro"
+  | "habilidade"
+  | "energia"
+  | "sorte"
+  | "ouro"
+  | "provisoes";
 
 export type FormData = {
   email: string;
@@ -27,7 +32,15 @@ type PersonagemFormData = Pick<PersonagemStateProps, "Nome"> & {
   saude: string;
 };
 
-export type ControlFormData = FormData | PersonagemFormData;
+type LobisomemFormData = Pick<PersonagemStateProps, "Nome"> & {
+  habilidade: string;
+  energia: string;
+  sorte: string;
+  ouro: string;
+  provisoes: string;
+};
+
+export type ControlFormData = FormData | PersonagemFormData | LobisomemFormData;
 
 type FormInputComponentProps = {
   control: Control<ControlFormData, any>;
@@ -79,7 +92,8 @@ const FormInputComponent: React.FC<FormInputComponentProps> = ({
   );
 };
 
-export const FieldWrapper = styled.div`
+export const FieldWrapper = styled.div<{ $area?: string }>`
+  grid-area: ${({ $area }) => $area || "auto"};
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);
